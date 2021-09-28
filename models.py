@@ -34,7 +34,7 @@ class Seller(db.Model):
 
 class Buyer(db.Model):
     __tablename__ = 'buyer'
-        id= db.Column(db.Integer, primary_key=True)
+    id= db.Column(db.Integer, primary_key=True)
     firstname = db.Column(db.String(50), nullable=False)
     lastname = db.Column(db.String(50), nullable=False)
     rut = db.Column(db.String(10), nullable=False)
