@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
-from models import db, Seller, Buyer
+from models import db, Seller, Buyer, Sales
 from flask_migrate import Migrate
 
 app = Flask(__name__)
@@ -50,25 +50,23 @@ def buyer():
 
     return jsonify(seller.serialize()), 200
 
-@app.route ("/buyer", methods=["GET", "POST"])
-def buyer():
+@app.route ("/sales", methods=["GET", "POST"])
+def sales():
     if request.method == "GET":
-        buyer = Buyer.query.get(1)
-        return jsonify(buyer.serialize()), 200
+        sales = Sales.query.get(1)
+        return jsonify(sales.serialize()), 200
     else:
-        buyer = Buyer()
-        buyer.firstname = request.json.get("firstname")
-        buyer.lastname = request.json.get("lastname")
-        buyer.rut = request.json.get("rut")
-        buyer.password = request.json.get("password")
-        buyer.email = request.json.get("email")
-        
+        sales = Sales()
+        sales.seller = request.json.get("sales")
+        sales.buyer = request.json.get("buyer")
+        sales.amount = request.json.get("amount")
+
         
 
-        db.session.add(buyer)
+        db.session.add(sales)
         db.session.commit()
 
-    return jsonify(buyer.serialize()), 200
+    return jsonify(sales.serialize()), 200
 
 
 if __name__== "__main__":
