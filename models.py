@@ -59,3 +59,27 @@ class Buyer(db.Model):
             'firstname': self.firstname,
             'lastname': self.lastname
         }
+
+class Sales(db.Model):
+    __tablename__ = 'sales'
+    id= db.Column(db.Integer, primary_key=True)
+    seller = db.Column(db.String(50), nullable=False)
+    buyer = db.Column(db.String(50), nullable=False)
+    amount = db.Column(db.String(10), nullable=False)
+
+    def __repr__(self):
+        return "<Post %r>" % self.id
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'seller': self.seller,
+            'buyer': self.buyer,
+            'amount': self.amount
+        }
+    def serialize_just_name(self):
+        return {
+            'id': self.id,
+            'selles': self.firstname,
+            'amount': self.amount
+        }
