@@ -6,7 +6,8 @@ class Seller(db.Model):
     id= db.Column(db.Integer, primary_key=True)
     firstname = db.Column(db.String(50), nullable=False)
     lastname = db.Column(db.String(50), nullable=False)
-    rut = db.Column(db.String(10), nullable=False)
+    rut = db.Column(db.Integer, nullable=False)
+    store_name = db.Column(db.String(20), nullable=False)
     password = db.Column(db.String, nullable=False)
     email = db.Column(db.String(50), nullable=False)
     link = db.Column(db.String(100), nullable=False)
@@ -21,6 +22,7 @@ class Seller(db.Model):
             'firstname': self.firstname,
             'lastname': self.lastname,
             'rut': self.rut,
+            'store_name' : self.store_name,
             'password': self.password,
             'email': self.email,
             'link': self.link
@@ -30,6 +32,7 @@ class Seller(db.Model):
             'id': self.id,
             'firstname': self.firstname,
             'lastname': self.lastname
+            'store_name' : self.store_name
         }
 
 class Buyer(db.Model):
@@ -63,9 +66,13 @@ class Buyer(db.Model):
 class Sales(db.Model):
     __tablename__ = 'sales'
     id= db.Column(db.Integer, primary_key=True)
-    seller = db.Column(db.String(50), nullable=False)
-    buyer = db.Column(db.String(50), nullable=False)
-    amount = db.Column(db.String(10), nullable=False)
+    sellerID = Column(Integer, ForeignKey('seller.id'))
+    buyerID = Column(Integer, ForeignKey('buyer.id'))
+    seller = db.relationship("Seller", backref=db.backref("seller", lazy = True))
+    buyer = db.relationship("Buyer", backref=db.backref("buyer", lazy = True))
+   # postID = Column(Integer, nullable= False) FALTA TABA POST
+   # item_title = Column(Integer, nullable= False) FALTA TABLA POST
+    #item_price =Column(Integer, nullable= False) FALTA TABLA POST
 
     def __repr__(self):
         return "<Post %r>" % self.id
@@ -75,11 +82,13 @@ class Sales(db.Model):
             'id': self.id,
             'seller': self.seller,
             'buyer': self.buyer,
-            'amount': self.amount
+            #'postID': self.postID FALTA TABA POST
+            #'item_title': self.item_title FALTA TABA POST
+            #'item_price': self.item_price FALTA TABA POST
         }
     def serialize_just_name(self):
         return {
             'id': self.id,
-            'selles': self.firstname,
-            'amount': self.amount
+            'seller': self.seller,
+            
         }
