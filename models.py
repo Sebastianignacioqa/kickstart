@@ -80,8 +80,8 @@ class Sales(db.Model):
     def serialize(self):
         return {
             'id': self.id,
-            'seller': self.seller,
-            'buyer': self.buyer,
+            'sellerID': self.seller,
+            'buyerID': self.buyer,
             #'postID': self.postID FALTA TABA POST
             #'item_title': self.item_title FALTA TABA POST
             #'item_price': self.item_price FALTA TABA POST
