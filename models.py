@@ -31,7 +31,7 @@ class Seller(db.Model):
         return {
             'id': self.id,
             'firstname': self.firstname,
-            'lastname': self.lastname
+            'lastname': self.lastname,
             'store_name' : self.store_name
         }
 
@@ -66,8 +66,8 @@ class Buyer(db.Model):
 class Sales(db.Model):
     __tablename__ = 'sales'
     id= db.Column(db.Integer, primary_key=True)
-    sellerID = Column(Integer, ForeignKey('seller.id'))
-    buyerID = Column(Integer, ForeignKey('buyer.id'))
+    sellerID = db.Column(db.Integer, db.ForeignKey('seller.id'))
+    buyerID = db.Column(db.Integer, db.ForeignKey('buyer.id'))
     seller = db.relationship("Seller", backref=db.backref("seller", lazy = True))
     buyer = db.relationship("Buyer", backref=db.backref("buyer", lazy = True))
    # postID = Column(Integer, nullable= False) FALTA TABA POST

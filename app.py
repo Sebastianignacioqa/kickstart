@@ -59,7 +59,6 @@ def sales():
         sales = Sales()
         sales.seller = request.json.get("sales")
         sales.buyer = request.json.get("buyer")
-        sales.amount = request.json.get("amount")
 
         
 
