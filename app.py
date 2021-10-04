@@ -20,6 +20,7 @@ def seller():
         seller.firstname = request.json.get("firstname")
         seller.lastname = request.json.get("lastname")
         seller.rut = request.json.get("rut")
+        seller.store_name = request.json.get("store_name")
         seller.password = request.json.get("password")
         seller.email = request.json.get("email")
         seller.link = request.json.get("link")
@@ -28,7 +29,7 @@ def seller():
         db.session.add(seller)
         db.session.commit()
 
-    return jsonify(user.serialize()), 200
+    return jsonify(seller.serialize()), 200
 
 @app.route ("/buyer", methods=["GET", "POST"])
 def buyer():
@@ -48,7 +49,7 @@ def buyer():
         db.session.add(buyer)
         db.session.commit()
 
-    return jsonify(seller.serialize()), 200
+    return jsonify(buyer.serialize()), 200
 
 @app.route ("/sales", methods=["GET", "POST"])
 def sales():
@@ -57,8 +58,8 @@ def sales():
         return jsonify(sales.serialize()), 200
     else:
         sales = Sales()
-        sales.seller = request.json.get("sales")
-        sales.buyer = request.json.get("buyer")
+        sales.sellerID = request.json.get("sellerID")
+        sales.buyerID = request.json.get("buyerID")
 
         
 
