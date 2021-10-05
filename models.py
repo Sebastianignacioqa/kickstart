@@ -45,7 +45,7 @@ class Buyer(db.Model):
     email = db.Column(db.String(50), nullable=False)
 
     def __repr__(self):
-        return "<Post %r>" % self.id
+        return "<Buyer %r>" % self.id
 
     def serialize(self):
         return {
@@ -63,32 +63,65 @@ class Buyer(db.Model):
             'lastname': self.lastname
         }
 
-class Sales(db.Model):
-    __tablename__ = 'sales'
+class Sale(db.Model):
+    __tablename__ = 'sale'
     id= db.Column(db.Integer, primary_key=True)
     sellerID = db.Column(db.Integer, db.ForeignKey('seller.id'))
     buyerID = db.Column(db.Integer, db.ForeignKey('buyer.id'))
     seller = db.relationship("Seller", backref=db.backref("seller", lazy = True))
     buyer = db.relationship("Buyer", backref=db.backref("buyer", lazy = True))
-   # postID = Column(Integer, nullable= False) FALTA TABA POST
-   # item_title = Column(Integer, nullable= False) FALTA TABLA POST
-    #item_price =Column(Integer, nullable= False) FALTA TABLA POST
+    productID = db.Column(db.Integer, db.ForeignKey('product.id')) 
+    product = db.relationship("Product", backref=db.backref("product", lazy = True))
+    item_title = db.Column(db.Integer, nullable= False) 
+    item_price = db.Column(db.Integer, nullable= False) 
 
     def __repr__(self):
-        return "<Post %r>" % self.id
+        return "<Sale %r>" % self.id
 
     def serialize(self):
         return {
             'id': self.id,
-            'sellerID': self.seller,
-            'buyerID': self.buyer,
-            #'postID': self.postID FALTA TABA POST
-            #'item_title': self.item_title FALTA TABA POST
-            #'item_price': self.item_price FALTA TABA POST
+            'sellerID': self.sellerID,
+            'buyerID': self.buyerID,
+            'postID': self.postID,
+            'item_title': self.item_title,
+            'item_price': self.item_price
         }
     def serialize_just_name(self):
         return {
             'id': self.id,
-            'seller': self.seller,
+            'sellerID': self.sellerID,
             
+        }
+class Product(db.Model):
+    __tablename__= 'product'
+    id= db.Column(db.Integer, primary_key=True)
+    sellerID = db.Column(db.Integer, db.ForeignKey('seller.id'))
+    store_name = db.Column(db.String(30), nullable=False)
+    item_title = db.Column(db.String(50), nullable=False)
+    item_photo = db.Column(db.String(250), nullable=False)
+    item_description = db.Column(db.String(250), nullable=False)
+    item_stock = db.Column(db.String(15), nullable=False)
+    item_price = db.Column(db.Integer, nullable=False)
+
+    def __repr__(self):
+        return "<Product %r>" % self.id
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'sellerID': self.sellerID,
+            'store_name': self.store_name,
+            'item_title': self.item_title,
+            'item_photo': self.item_photo,
+            'item_description': self.item_description,
+            'item_stock': self.item_stock,
+            'item_price': self.item_price
+        }
+    def serialize_just_name(self):
+        return {
+            'id': self.id,
+            'sellerID': self.sellerID,
+            'store_name': self.store_name,
+            'item_title': self.item_title
         }

@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
-from models import db, Seller, Buyer, Sales
+from models import db, Seller, Buyer, Sale, Product
 from flask_migrate import Migrate
 
 app = Flask(__name__)
@@ -35,7 +35,7 @@ def seller():
 def buyer():
     if request.method == "GET":
         buyer = Buyer.query.get(1)
-        return jsonify(seller.serialize()), 200
+        return jsonify(buyer.serialize()), 200
     else:
         buyer = Buyer()
         buyer.firstname = request.json.get("firstname")
@@ -51,22 +51,44 @@ def buyer():
 
     return jsonify(buyer.serialize()), 200
 
-@app.route ("/sales", methods=["GET", "POST"])
-def sales():
+@app.route ("/sale", methods=["GET", "POST"])
+def sale():
     if request.method == "GET":
-        sales = Sales.query.get(1)
-        return jsonify(sales.serialize()), 200
+        sale = Sale.query.get(1)
+        return jsonify(sale.serialize()), 200
     else:
-        sales = Sales()
-        sales.sellerID = request.json.get("sellerID")
-        sales.buyerID = request.json.get("buyerID")
+        sale = Sale()
+        sale.sellerID = request.json.get("sellerID")
+        sale.buyerID = request.json.get("buyerID")
 
         
 
-        db.session.add(sales)
+        db.session.add(sale)
         db.session.commit()
 
-    return jsonify(sales.serialize()), 200
+    return jsonify(sale.serialize()), 200
+
+@app.route ("/product", methods=["GET", "POST"])
+def product():
+    if request.method == "GET":
+        product = Product.query.get(1)
+        return jsonify(product.serialize()), 200
+    else:
+        product = Product()
+        product.sellerID = request.json.get("sellerID")
+        product.store_name = request.json.get("store_name")
+        product.item_title = request.json.get("item_title")
+        product.item_photo = request.json.get("item_photo")
+        product.item_description = request.json.get("item_description")
+        product.item_stock = request.json.get("item_stock")
+        product.item_price = request.json.get("item_price")
+
+        
+
+        db.session.add(product)
+        db.session.commit()
+
+    return jsonify(product.serialize()), 200
 
 
 if __name__== "__main__":
