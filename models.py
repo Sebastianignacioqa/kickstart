@@ -59,3 +59,33 @@ class Buyer(db.Model):
             'firstname': self.firstname,
             'lastname': self.lastname
         }
+
+
+
+class Balance(db.Model):
+    __tablename__ = 'balance'
+    id= db.Column(db.Integer, primary_key=True)
+    current_balance = db.Column(db.Integer)
+    last_deposit = db.Column(db.Integer)
+    last_withdraw = db.Column(db.Integer)
+    
+    
+
+    def __repr__(self):
+        return "<Post %r>" % self.id
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'current_balance': self.current_balance,
+            'last_deposit': self.last_deposit,
+            'last_withdraw': self.last_withdraw,
+            
+            
+        }
+    def serialize_just_name(self):
+        return {
+            'id': self.id,
+            'current_balance': self.current_balance
+            
+        }

@@ -1,10 +1,10 @@
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
-from models import db, Seller, Buyer
+from models import db, Seller, Buyer, Balance
 from flask_migrate import Migrate
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:isac1234@localhost:5432/kickstart'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:6kjqxSDJ44!w@localhost:5432/kickstart'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True
 db.init_app(app)
@@ -31,7 +31,7 @@ def seller():
     return jsonify(user.serialize()), 200
 
 @app.route ("/buyer", methods=["GET", "POST"])
-def buyerr():
+def buyer():
     if request.method == "GET":
         buyer = Buyer.query.get(1)
         return jsonify(user.serialize()), 200
@@ -51,5 +51,43 @@ def buyerr():
     return jsonify(user.serialize()), 200
 
 
+
+
+@app.route ("/balance", methods=["GET", "POST", "PUT"])
+def balance():
+    if request.method == "GET":
+        balance = Balance.query.get(1)
+        return jsonify(balance.serialize()), 200
+
+    if request.method == "PUT":
+        balance = Balance.query.get(1)
+        current_balance = ""
+        last_deposit = ""
+        last_withdraw = ""
+        
+        db.session.commit()
+
+    else:
+        balance = Balance()
+        current_balance = request.json.get("current_balance")
+        last_deposit = request.json.get("last_deposit")
+        last_withdraw = request.json.get("last_withdraw")
+        
+        
+        
+        
+
+        db.session.add(balance)
+        db.session.commit()
+
+    return jsonify(balance.serialize()), 200
+
+
+
+
 if __name__== "__main__":
     app.run(host='localhost', port = 8080)
+
+
+
+
