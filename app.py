@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
-from models import db, Seller, Buyer, Sales, Postseller, Favorites
+from models import db, Seller, Buyer, Sale, Product, Favorite
 from flask_migrate import Migrate
 
 app = Flask(__name__)
@@ -51,67 +51,67 @@ def buyer():
 
     return jsonify(buyer.serialize()), 200
 
-@app.route ("/sales", methods=["GET", "POST"])
-def sales():
+@app.route ("/sale", methods=["GET", "POST"])
+def sale():
     if request.method == "GET":
-        sales = Sales.query.get(1)
-        return jsonify(sales.serialize()), 200
+        sale = Sale.query.get(1)
+        return jsonify(sale.serialize()), 200
     else:
-        sales = Sales()
-        sales.seller = request.json.get("sales")
-        sales.buyer = request.json.get("buyer")
+        sale = Sale()
+        sale.seller = request.json.get("sale")
+        sale.buyer = request.json.get("buyer")
 
         
 
-        db.session.add(sales)
+        db.session.add(sale)
         db.session.commit()
 
-    return jsonify(sales.serialize()), 200
+    return jsonify(sale.serialize()), 200
 
 
-@app.route ("/postseller", methods=["GET", "POST", "PUT"])
-def postseller():
+@app.route ("/product", methods=["GET", "POST", "PUT"])
+def product():
     if request.method == "GET":
-        postseller = Postseller.query.get(1)
-        return jsonify(postseller.serialize()), 200
+        product = Product.query.get(1)
+        return jsonify(product.serialize()), 200
         
     if request.method == "PUT":
-        postseller = Postseller.query.get(1)
-        postseller.item_title = ""
-        postseller.item_photo = ""
-        postseller.item_description = ""
-        postseller.item_stock = ""
-        postseller.item_price = ""
+        product = Product.query.get(1)
+        product.item_title = ""
+        product.item_photo = ""
+        product.item_description = ""
+        product.item_stock = ""
+        product.item_price = ""
 
         db.session.commit()
     else:
-        postseller = Postseller()
-        postseller.store_name = request.json.get("store_name")
-        postseller.item_title = request.json.get("item_title")
-        postseller.item_photo = request.json.get("item_photo")
-        postseller.item_description = request.json.get("item_description")
-        postseller.item_stock = request.json.get("item_stock")
-        postseller.item_price = request.json.get("item_price")
+        product = Product()
+        product.store_name = request.json.get("store_name")
+        product.item_title = request.json.get("item_title")
+        product.item_photo = request.json.get("item_photo")
+        product.item_description = request.json.get("item_description")
+        product.item_stock = request.json.get("item_stock")
+        product.item_price = request.json.get("item_price")
 
-        db.session.add(postseller)
+        db.session.add(product)
         db.session.commit()
 
-    return jsonify(postseller.serialize()), 200
+    return jsonify(product.serialize()), 200
 
 
-@app.route ("/favorites", methods=["GET", "POST"])
-def favorites():
+@app.route ("/favorite", methods=["GET", "POST"])
+def favorite():
     if request.method == "GET":
-        favorites = Favorites.query.get(1)
-        return jsonify(favorites.serialize()), 200
+        favorite = Favorite.query.get(1)
+        return jsonify(favorite.serialize()), 200
     else:
-        favorites = Favorites()
-        favorites.store_name = request.json.get("store_name")    
+        favorite = Favorite()
+        favorite.store_name = request.json.get("store_name")    
 
-        db.session.add(favorites)
+        db.session.add(favorite)
         db.session.commit()
 
-    return jsonify(favorites.serialize()), 200
+    return jsonify(favorite.serialize()), 200
 
 
 if __name__== "__main__":

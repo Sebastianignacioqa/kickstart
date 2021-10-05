@@ -63,8 +63,8 @@ class Buyer(db.Model):
             'lastname': self.lastname
         }
 
-class Sales(db.Model):
-    __tablename__ = 'sales'
+class Sale(db.Model):
+    __tablename__ = 'sale'
     id= db.Column(db.Integer, primary_key=True)
     sellerID = db.Column(db.Integer, db.ForeignKey('seller.id'))
     buyerID = db.Column(db.Integer, db.ForeignKey('buyer.id'))
@@ -94,19 +94,19 @@ class Sales(db.Model):
         }
 
 
-class Postseller(db.Model):
-    __tablename__= 'postseller'
+class Product(db.Model):
+    __tablename__= 'product'
     id= db.Column(db.Integer, primary_key=True)
     store_name = db.Column(db.String(30), nullable=False)
     item_title = db.Column(db.String(50), nullable=False)
-    item_photo = db.Column(db.String(50), nullable=False)
+    item_photo = db.Column(db.String(250), nullable=False)
     item_description = db.Column(db.String(150), nullable=False)
     item_stock = db.Column(db.String(15), nullable=False)
     item_price = db.Column(db.Integer, nullable=False)
     sellerID
 
     def __repr__(self):
-        return "<Postseller %r>" % self.id
+        return "<Product %r>" % self.id
 
     def serialize(self):
         return {
@@ -125,13 +125,13 @@ class Postseller(db.Model):
             'item_title': self.item_title
         }
 
-class Favorites(db.Model):
-    __tablename__= 'favorites'
+class Favorite(db.Model):
+    __tablename__= 'favorite'
     id= db.Column(db.Integer, primary_key=True)
     store_name = db.Column(db.String(30), nullable=False)
 
     def __repr__(self):
-        return "<Favorites %r>" % self.id
+        return "<Favorite %r>" % self.id
 
     def serialize(self):
         return {
