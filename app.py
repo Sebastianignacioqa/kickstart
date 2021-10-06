@@ -129,7 +129,7 @@ def payment():
     return jsonify(payment.serialize()), 200
 
 @app.route ("/dispatch", methods=["GET", "POST"])
-def payment():
+def dispatch():
     if request.method == "GET":
         dispatch = Dispatch.query.get(1)
         return jsonify(dispatch.serialize()), 200
@@ -145,7 +145,7 @@ def payment():
     return jsonify(dispatch.serialize()), 200
 
 @app.route ("/balance", methods=["GET", "POST"])
-def payment():
+def balance():
     if request.method == "GET":
         balance = Balance.query.get(1)
         return jsonify(balance.serialize()), 200
