@@ -68,6 +68,8 @@ class Balance(db.Model):
     current_balance = db.Column(db.Integer)
     last_deposit = db.Column(db.Integer)
     last_withdraw = db.Column(db.Integer)
+    sellerID = db.Column(db.Integer, db.ForeignKey('seller.id'))
+    seller = db.relationship("Seller", backref=db.backref("seller", lazy = True))
     
     
 
