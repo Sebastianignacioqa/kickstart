@@ -24,7 +24,6 @@ def seller():
         seller.password = request.json.get("password")
         seller.email = request.json.get("email")
         seller.link = request.json.get("link")
-        
 
         db.session.add(seller)
         db.session.commit()
@@ -42,9 +41,7 @@ def buyer():
         buyer.lastname = request.json.get("lastname")
         buyer.rut = request.json.get("rut")
         buyer.password = request.json.get("password")
-        buyer.email = request.json.get("email")
-        
-        
+        buyer.email = request.json.get("email")       
 
         db.session.add(buyer)
         db.session.commit()
@@ -58,11 +55,9 @@ def sale():
         return jsonify(sale.serialize()), 200
     else:
         sale = Sale()
-        sale.seller = request.json.get("sale")
-        sale.buyer = request.json.get("buyer")
-
-        
-
+        sale.sellerID = request.json.get("sellerID")
+        sale.buyerID = request.json.get("buyerID")
+      
         db.session.add(sale)
         db.session.commit()
 
@@ -86,6 +81,7 @@ def product():
         db.session.commit()
     else:
         product = Product()
+        product.sellerID = request.json.get("sellerID")
         product.store_name = request.json.get("store_name")
         product.item_title = request.json.get("item_title")
         product.item_photo = request.json.get("item_photo")
