@@ -11,7 +11,6 @@ class Seller(db.Model):
     password = db.Column(db.String, nullable=False)
     email = db.Column(db.String(50), nullable=False)
     link = db.Column(db.String(100), nullable=False)
-    
 
     def __repr__(self):
         return "<Seller %r>" % self.id
@@ -34,6 +33,7 @@ class Seller(db.Model):
             'lastname': self.lastname,
             'store_name': self.store_name
         }
+
 
 class Buyer(db.Model):
     __tablename__ = 'buyer'
@@ -62,6 +62,7 @@ class Buyer(db.Model):
             'firstname': self.firstname,
             'lastname': self.lastname
         }
+
 
 class Sale(db.Model):
     __tablename__ = 'sale'
@@ -105,7 +106,6 @@ class Product(db.Model):
     item_description = db.Column(db.String(250), nullable=False)
     item_stock = db.Column(db.String(15), nullable=False)
     item_price = db.Column(db.Integer, nullable=False)
-    
 
     def __repr__(self):
         return "<Product %r>" % self.id
@@ -128,6 +128,7 @@ class Product(db.Model):
             'store_name': self.store_name,
             'item_title': self.item_title
         }
+
 
 class Favorite(db.Model):
     __tablename__= 'favorite'
@@ -153,4 +154,95 @@ class Favorite(db.Model):
         return {
             'id': self.id,
             'store_name': self.store_name
+        }
+
+
+class Payment(db.Model):
+    __tablename__= 'payment'
+    id= db.Column(db.Integer, primary_key=True)
+    buyerID = db.Column(db.Integer, db.ForeignKey('buyer.id'))
+    buyer = db.relationship("Buyer", backref=db.backref("buyer", lazy = True))
+    debit = db.Column(db.Boolean, default=False, nullable=False)
+    credit = db.Column(db.Boolean, default=False, nullable=False)
+    transfer = db.Column(db.Boolean, default=False, nullable=False)
+
+    def __repr__(self):
+        return "<Payment %r>" % self.id
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'buyerID': self.buyerID,
+            'debit': self.debit,
+            'credit': self.credit,
+            'transfer': self.transfer
+        }
+
+    def serialize_just_name(self):
+        return {
+            'id': self.id,
+            'debit': self.debit,
+            'credit': self.credit,
+            'transfer': self.transfer
+        }
+
+
+class Dispatch(db.Model):
+    __tablename__= 'dispatch'
+    id= db.Column(db.Integer, primary_key=True)
+    sellerID = db.Column(db.Integer, db.ForeignKey('seller.id'))
+    seller = db.relationship("Seller", backref=db.backref("seller", lazy = True))
+    in_address = db.Column(db.String(50), nullable=False)
+    delivery = db.Column(db.String(50), nullable=False)
+
+    def __repr__(self):
+        return "<Dispatch %r>" % self.id
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'sellerID': self.sellerID,
+            'in_address': self.in_address,
+            'delivery': self.delivery
+        }
+
+    def serialize_just_name(self):
+        return {
+            'id': self.id,
+            'in_address': self.in_address,
+            'delivery': self.delivery
+        }
+
+
+class Balance(db.Model):
+    __tablename__= 'balance'
+    id= db.Column(db.Integer, primary_key=True)
+    sellerID = db.Column(db.Integer, db.ForeignKey('seller.id'))
+    seller = db.relationship("Seller", backref=db.backref("seller", lazy = True))
+    store_name = db.Column(db.String(30), nullable=False)
+    current_balance = db.Column(db.Integer, nullable=False)
+    last_deposit = db.Column(db.Integer, nullable=False)
+    last_withdraw = db.Column(db.Integer, nullable=False)
+    
+
+    def __repr__(self):
+        return "<Balance %r>" % self.id
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'sellerID': self.sellerID,
+            'store_name': self.store_name,
+            'current_balance': self.current_balance,
+            'last_deposit': self.last_deposit,
+            'last_withdraw': self.last_withdraw
+        }
+
+    def serialize_just_name(self):
+        return {
+            'id': self.id,
+            'store_name': self.store_name,
+            'current_balance': self.current_balance,
+            'last_deposit': self.last_deposit,
+            'last_withdraw': self.last_withdraw
         }

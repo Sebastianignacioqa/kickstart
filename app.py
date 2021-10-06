@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
-from models import db, Seller, Buyer, Sale, Product, Favorite
+from models import db, Seller, Buyer, Sale, Product, Favorite, Payment, Dispatch, Balance
 from flask_migrate import Migrate
 
 app = Flask(__name__)
@@ -110,6 +110,57 @@ def favorite():
         db.session.commit()
 
     return jsonify(favorite.serialize()), 200
+
+@app.route ("/payment", methods=["GET", "POST"])
+def payment():
+    if request.method == "GET":
+        payment = Payment.query.get(1)
+        return jsonify(payment.serialize()), 200
+    else:
+        payment = Payment()
+        payment.buyerID = request.json.get("buyerID")
+        payment.debit = request.json.get("debit")
+        payment.credit = request.json.get("credit")
+        payment.transfer = request.json.get("transfer")     
+
+        db.session.add(payment)
+        db.session.commit()
+
+    return jsonify(payment.serialize()), 200
+
+@app.route ("/dispatch", methods=["GET", "POST"])
+def payment():
+    if request.method == "GET":
+        dispatch = Dispatch.query.get(1)
+        return jsonify(dispatch.serialize()), 200
+    else:
+        dispatch = Dispatch()
+        dispatch.sellerID = request.json.get("sellerID")
+        dispatch.in_address = request.json.get("in_address")
+        dispatch.delivery = request.json.get("delivery")   
+
+        db.session.add(dispatch)
+        db.session.commit()
+
+    return jsonify(dispatch.serialize()), 200
+
+@app.route ("/balance", methods=["GET", "POST"])
+def payment():
+    if request.method == "GET":
+        balance = Balance.query.get(1)
+        return jsonify(balance.serialize()), 200
+    else:
+        balance = Balance()
+        balance.sellerID = request.json.get("sellerID")
+        balance.store_name = request.json.get("store_name")
+        balance.current_balance = request.json.get("current_balance")
+        balance.last_deposit = request.json.get("last_deposit")
+        balance.last_withdraw = request.json.get("last_withdraw")        
+
+        db.session.add(balance)
+        db.session.commit()
+
+    return jsonify(balance.serialize()), 200
 
 
 if __name__== "__main__":
