@@ -102,6 +102,8 @@ def favorite():
         return jsonify(favorite.serialize()), 200
     else:
         favorite = Favorite()
+        favorite.buyerID = request.json.get("buyerID")
+        favorite.sellerID = request.json.get("sellerID")
         favorite.store_name = request.json.get("store_name")    
 
         db.session.add(favorite)

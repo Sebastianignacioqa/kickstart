@@ -98,6 +98,7 @@ class Product(db.Model):
     __tablename__= 'product'
     id= db.Column(db.Integer, primary_key=True)
     sellerID = db.Column(db.Integer, db.ForeignKey('seller.id'))
+    seller = db.relationship("Seller", backref=db.backref("seller", lazy = True))
     store_name = db.Column(db.String(30), nullable=False)
     item_title = db.Column(db.String(50), nullable=False)
     item_photo = db.Column(db.String(250), nullable=False)
@@ -130,13 +131,25 @@ class Product(db.Model):
 
 class Favorite(db.Model):
     __tablename__= 'favorite'
-    id= db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
+    buyerID = db.Column(db.Integer, db.ForeignKey('buyer.id'))
+    sellerID = db.Column(db.Integer, db.ForeignKey('seller.id'))
     store_name = db.Column(db.String(30), nullable=False)
+    seller = db.relationship("Seller", backref=db.backref("seller", lazy = True))
+    buyer = db.relationship("Buyer", backref=db.backref("buyer", lazy = True))
 
     def __repr__(self):
         return "<Favorite %r>" % self.id
 
     def serialize(self):
+        return {
+            'id': self.id,
+            'buyerID': self.buyerID,
+            'sellerID': self.sellerID,
+            'store_name': self.store_name
+        }
+    
+    def serialize_just_name(self):
         return {
             'id': self.id,
             'store_name': self.store_name
