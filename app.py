@@ -10,6 +10,19 @@ app.config['DEBUG'] = True
 db.init_app(app)
 Migrate(app, db)
 
+@app.route ("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "GET":
+        seller = Seller.query.get(1)
+        return jsonify(seller.serialize()), 200
+    else:
+        seller = Seller()
+        seller.rut = request.json.get("rut")
+        seller.password = request.json.get("password")
+        
+    return jsonify(seller.serialize_just_login()), 200
+
+
 @app.route ("/seller", methods=["GET", "POST"])
 def seller():
     if request.method == "GET":
