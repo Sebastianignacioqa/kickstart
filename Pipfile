@@ -9,6 +9,7 @@ flask-sqlalchemy = "*"
 flask-migrate = "*"
 psycopg2-binary = "*"
 graphviz = "*"
+flask-cors = "*"
 
 [dev-packages]
 

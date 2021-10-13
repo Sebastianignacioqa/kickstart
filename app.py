@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from models import db, Seller, Buyer, Sale, Product
 from flask_migrate import Migrate
+from flask_cors import CORS
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:isac1234@localhost:5432/kickstart'
@@ -9,12 +10,13 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True
 db.init_app(app)
 Migrate(app, db)
+CORS(app)
 
 @app.route ("/seller", methods=["GET", "POST"])
 def seller():
     if request.method == "GET":
         seller = Seller.query.get(1)
-        return jsonify(user.serialize()), 200
+        return jsonify(seller.serialize()), 200
     else:
         seller = Seller()
         seller.firstname = request.json.get("firstname")
@@ -89,6 +91,18 @@ def product():
         db.session.commit()
 
     return jsonify(product.serialize()), 200
+
+@app.route ("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "GET":
+        seller = Seller.query.get(1)
+        return jsonify(seller.serialize()), 200
+    else:
+        seller = Seller()
+        seller.rut = request.json.get("rut")
+        seller.password = request.json.get("password")
+
+    return jsonify(seller.serialize_just_login()), 200
 
 
 if __name__== "__main__":
