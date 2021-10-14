@@ -54,11 +54,10 @@ class Buyer(db.Model):
             'password': self.password,
             'email': self.email
         }
-    def serialize_just_name(self):
+    def serialize_just_login(self):
         return {
-            'id': self.id,
-            'firstname': self.firstname,
-            'lastname': self.lastname
+            'rut': self.rut,
+            'password': self.password
         }
 
 class Sale(db.Model):
