@@ -6,11 +6,14 @@ class Seller(db.Model):
     id= db.Column(db.Integer, primary_key=True)
     firstname = db.Column(db.String(50), nullable=False)
     lastname = db.Column(db.String(50), nullable=False)
-    rut = db.Column(db.Integer, nullable=False)
-    store_name = db.Column(db.String(20), nullable=False)
-    password = db.Column(db.String, nullable=False)
-    email = db.Column(db.String(50), nullable=False)
+    rut = db.Column(db.String(15), nullable=False)
+    email = db.Column(db.String(30), nullable=False)
+    password = db.Column(db.String(20), nullable=False)
+    address = db.Column(db.String(50), nullable=False)
+    phonenumber = db.Column(db.String(15), nullable=False)
+    store_name = db.Column(db.String(30), nullable=False)   
     link = db.Column(db.String(100), nullable=False)
+    category = db.Column(db.String(20), nullable=False) 
 
     def __repr__(self):
         return "<Seller %r>" % self.id
@@ -21,17 +24,21 @@ class Seller(db.Model):
             'firstname': self.firstname,
             'lastname': self.lastname,
             'rut': self.rut,
-            'store_name' : self.store_name,
-            'password': self.password,
             'email': self.email,
-            'link': self.link
+            'password': self.password,
+            'address': self.address,
+            'phonenumber': self.phonenumber,
+            'store_name' : self.store_name,           
+            'link': self.link,
+            'category': self.category
         }
     def serialize_just_name(self):
         return {
             'id': self.id,
             'firstname': self.firstname,
             'lastname': self.lastname,
-            'store_name': self.store_name
+            'store_name': self.store_name,
+            'category': self.category
         }
 
 
