@@ -23,7 +23,7 @@ def login():
     return jsonify(seller.serialize_just_login()), 200
 
 
-@app.route ("/seller", methods=["GET", "POST"])
+@app.route ("/formulario-tienda", methods=["GET", "POST"])
 def seller():
     if request.method == "GET":
         seller = Seller.query.get(1)
