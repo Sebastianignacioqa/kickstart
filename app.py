@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from models import db, Seller, Buyer, Sale, Product, Favorite, Payment, Dispatch, Balance
 from flask_migrate import Migrate
+from flask_cors import CORS
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:admin@localhost:5432/kickstart'
@@ -9,6 +10,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True
 db.init_app(app)
 Migrate(app, db)
+CORS(app)
 
 @app.route ("/login", methods=["GET", "POST"])
 def login():
@@ -23,7 +25,7 @@ def login():
     return jsonify(seller.serialize_just_login()), 200
 
 
-@app.route ("/registro-tienda", methods=["GET", "POST"])
+@app.route ("/registrotienda", methods=["GET", "POST"])
 def seller():
     if request.method == "GET":
         seller = Seller.query.get(1)
@@ -37,14 +39,14 @@ def seller():
         seller.password = request.json.get("password")
         seller.address = request.json.get("address")
         seller.phonenumber = request.json.get("phonenumber")
-        seller.store_name = request.json.get("store_name")       
+        seller.storename = request.json.get("storename")       
         seller.link = request.json.get("link")
         seller.category = request.json.get("category")
 
         db.session.add(seller)
         db.session.commit()
 
-    return jsonify(seller.serialize()), 200
+        return jsonify(seller.serialize()), 200
 
 @app.route ("/buyer", methods=["GET", "POST"])
 def buyer():
@@ -62,7 +64,7 @@ def buyer():
         db.session.add(buyer)
         db.session.commit()
 
-    return jsonify(buyer.serialize()), 200
+        return jsonify(buyer.serialize()), 200
 
 @app.route ("/sale", methods=["GET", "POST"])
 def sale():
@@ -77,7 +79,7 @@ def sale():
         db.session.add(sale)
         db.session.commit()
 
-    return jsonify(sale.serialize()), 200
+        return jsonify(sale.serialize()), 200
 
 
 @app.route ("/product", methods=["GET", "POST", "PUT"])
@@ -98,7 +100,7 @@ def product():
     else:
         product = Product()
         product.sellerID = request.json.get("sellerID")
-        product.store_name = request.json.get("store_name")
+        product.storename = request.json.get("storename")
         product.item_title = request.json.get("item_title")
         product.item_photo = request.json.get("item_photo")
         product.item_description = request.json.get("item_description")
@@ -108,7 +110,7 @@ def product():
         db.session.add(product)
         db.session.commit()
 
-    return jsonify(product.serialize()), 200
+        return jsonify(product.serialize()), 200
 
 
 @app.route ("/favorite", methods=["GET", "POST"])
@@ -120,12 +122,12 @@ def favorite():
         favorite = Favorite()
         favorite.buyerID = request.json.get("buyerID")
         favorite.sellerID = request.json.get("sellerID")
-        favorite.store_name = request.json.get("store_name")    
+        favorite.storename = request.json.get("storename")    
 
         db.session.add(favorite)
         db.session.commit()
 
-    return jsonify(favorite.serialize()), 200
+        return jsonify(favorite.serialize()), 200
 
 @app.route ("/payment", methods=["GET", "POST"])
 def payment():
@@ -142,7 +144,7 @@ def payment():
         db.session.add(payment)
         db.session.commit()
 
-    return jsonify(payment.serialize()), 200
+        return jsonify(payment.serialize()), 200
 
 @app.route ("/dispatch", methods=["GET", "POST"])
 def dispatch():
@@ -158,7 +160,7 @@ def dispatch():
         db.session.add(dispatch)
         db.session.commit()
 
-    return jsonify(dispatch.serialize()), 200
+        return jsonify(dispatch.serialize()), 200
 
 @app.route ("/balance", methods=["GET", "POST"])
 def balance():
@@ -168,7 +170,7 @@ def balance():
     else:
         balance = Balance()
         balance.sellerID = request.json.get("sellerID")
-        balance.store_name = request.json.get("store_name")
+        balance.storename = request.json.get("storename")
         balance.current_balance = request.json.get("current_balance")
         balance.last_deposit = request.json.get("last_deposit")
         balance.last_withdraw = request.json.get("last_withdraw")        
@@ -176,7 +178,7 @@ def balance():
         db.session.add(balance)
         db.session.commit()
 
-    return jsonify(balance.serialize()), 200
+        return jsonify(balance.serialize()), 200
 
 
 if __name__== "__main__":
