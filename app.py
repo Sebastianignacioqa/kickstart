@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from models import db, Seller, Buyer, Sale, Product
 from flask_migrate import Migrate
@@ -6,17 +6,34 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_wtf import Form
+from wtforms import StringField
+from flask_wtf.file import FileField, FileRequired, FileAllowed
+from wtforms.validators import DataRequired, Email
+
+UPLOAD_FOLDER = '/documents'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:isac1234@localhost:5432/kickstart'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True
 app.config["JWT_SECRET_KEY"] = "super-secret"
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+
+
 
 db.init_app(app)
 Migrate(app, db)
 CORS(app)
-jwt = JWTManager(app)
+
+class DocumentUploadForm(Form):
+    first_name = StringField("First Name", validators=[DataRequired()])
+    last_name = StringField("Last Name", validators=[DataRequired()])
+    email = StringField("Email", validators=[DataRequired(), Email()])
+    document = FileField("Document", validators=[FileRequired(), FileAllowed(['png', 'jpg', 'jpeg', 'gif'], 'IMAGE ONLY')])
+
 
 @app.route ("/seller", methods=["GET", "POST"])
 def seller():
@@ -123,6 +140,16 @@ def login2():
 
     return jsonify(buyer.serialize_just_login()), 200
 
+@app.route('/post')
+def index():
+    return "El documento fue adjunto satisfactoriamente"
+
+@app.route('/post', methods=['POST'])
+def upload_file():
+    uploaded_file = request.files['file']
+    if uploaded_file.filename != '':
+        uploaded_file.save(uploaded_file.filename)
+    return "Hello world"
 
 if __name__== "__main__":
     app.run(host='localhost', port = 8080)
