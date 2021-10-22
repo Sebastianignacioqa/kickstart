@@ -10,8 +10,9 @@ from flask_wtf import Form
 from wtforms import StringField
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms.validators import DataRequired, Email
+import os
 
-UPLOAD_FOLDER = '/documents'
+UPLOAD_FOLDER = 'documents'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 app = Flask(__name__)
@@ -148,7 +149,7 @@ def index():
 def upload_files():
     for uploaded_file in request.files.getlist('file'):
         if uploaded_file.filename != '':
-            uploaded_file.save(uploaded_file.filename)
+            uploaded_file.save(os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename))
     return "El documento fue adjunto satisfactoriamente"
 
 if __name__== "__main__":
