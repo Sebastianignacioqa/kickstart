@@ -30,7 +30,6 @@ class Seller(db.Model):
             'lastname': self.lastname,
             'rut': self.rut,
             'email': self.email,
-            'password': self.password,
             'address': self.address,
             'phonenumber': self.phonenumber,
             'storename' : self.storename,           
@@ -52,7 +51,7 @@ class Buyer(db.Model):
     id= db.Column(db.Integer, primary_key=True)
     firstname = db.Column(db.String(50), nullable=False)
     lastname = db.Column(db.String(50), nullable=False)
-    rut = db.Column(db.String(15), nullable=False)
+    rut = db.Column(db.String(12), nullable=False)
     password = db.Column(db.String(20), nullable=False)
     email = db.Column(db.String(30), nullable=False)
     favorite = db.relationship("Favorite", backref=db.backref("buyer", lazy = True))
@@ -67,7 +66,6 @@ class Buyer(db.Model):
             'firstname': self.firstname,
             'lastname': self.lastname,
             'rut': self.rut,
-            'password': self.password,
             'email': self.email
         }
     def serialize_just_name(self):

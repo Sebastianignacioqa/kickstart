@@ -5,7 +5,7 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:admin@localhost:5432/kickstart'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:admin@localhost:5432/kickstart2'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True
 db.init_app(app)
@@ -22,8 +22,24 @@ def login():
         seller.rut = request.json.get("rut")
         seller.password = request.json.get("password")
         
-    return jsonify(seller.serialize_just_login()), 200
+        return jsonify(seller.serialize_just_login()), 200
 
+
+@app.route ("/categorias", methods=["GET", "POST"])
+def artesanias():
+    if request.method == "POST":
+        categoria = request.json.get("categoria")
+        if categoria is None:
+            return jsonify("Categoría no válida"), 400
+        else:
+            arreglo=[]
+            categorias = Seller.query.filter_by(category=categoria).all()
+            if categorias is None:
+                return jsonify("No existen tiendas"), 200
+            for category in categorias:
+                arreglo.append(category.storename)
+            return jsonify(arreglo), 200
+            
 
 @app.route ("/registrotienda", methods=["GET", "POST"])
 def seller():
