@@ -9,6 +9,11 @@ flask-sqlalchemy = "*"
 flask-migrate = "*"
 psycopg2-binary = "*"
 flask-cors = "*"
+graphviz = "*"
+flask-jwt-extended = "*"
+flask-wtf = "*"
+flask-uploads = "*"
+email-validator = "*"
 
 [dev-packages]
 

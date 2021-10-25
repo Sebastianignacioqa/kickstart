@@ -26,7 +26,7 @@ def login():
 
 
 @app.route ("/categorias", methods=["GET", "POST"])
-def artesanias():
+def categorias():
     if request.method == "POST":
         categoria = request.json.get("categoria")
         if categoria is None:
