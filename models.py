@@ -7,10 +7,11 @@ class Seller(db.Model):
     firstname = db.Column(db.String(50), nullable=False)
     lastname = db.Column(db.String(50), nullable=False)
     rut = db.Column(db.String(10), nullable=False)
-    store_name = db.Column(db.String(20), nullable=False)
+    store_name = db.Column(db.String(50), nullable=False)
     password = db.Column(db.String, nullable=False)
     email = db.Column(db.String(50), nullable=False)
     link = db.Column(db.String(100), nullable=False)
+    product = db.relationship("Product", backref=db.backref("seller", lazy = True))
     
 
     def __repr__(self):
@@ -95,12 +96,13 @@ class Product(db.Model):
     __tablename__= 'product'
     id= db.Column(db.Integer, primary_key=True)
     sellerID = db.Column(db.Integer, db.ForeignKey('seller.id'))
-    store_name = db.Column(db.String(30), nullable=False)
+    store_name = db.Column(db.String(50))
     item_title = db.Column(db.String(50), nullable=False)
     item_photo = db.Column(db.String(250), nullable=False)
     item_description = db.Column(db.String(250), nullable=False)
     item_stock = db.Column(db.String(15), nullable=False)
     item_price = db.Column(db.Integer, nullable=False)
+    category = db.Column(db.String(50), nullable=False)
 
     def __repr__(self):
         return "<Product %r>" % self.id
@@ -114,7 +116,8 @@ class Product(db.Model):
             'item_photo': self.item_photo,
             'item_description': self.item_description,
             'item_stock': self.item_stock,
-            'item_price': self.item_price
+            'item_price': self.item_price,
+            'category': self.category
         }
     def serialize_just_name(self):
         return {

@@ -108,6 +108,7 @@ def product():
         product.item_description = request.json.get("item_description")
         product.item_stock = request.json.get("item_stock")
         product.item_price = request.json.get("item_price")
+        product.category = request.json.get("category")
 
         
 
