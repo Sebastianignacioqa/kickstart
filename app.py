@@ -1,11 +1,11 @@
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
-from models import db, Seller, Buyer, Sale, Product, Favorite, Payment, Dispatch, Balance
+from models import db, Seller, Buyer, Sale, Product, Favorite, Payment, Dispatch, Balance, Category
 from flask_migrate import Migrate
 from flask_cors import CORS
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:admin@localhost:5432/kickstart2'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:admin@localhost:5432/kickstart3'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True
 db.init_app(app)
@@ -23,6 +23,25 @@ def login():
         seller.password = request.json.get("password")
         
         return jsonify(seller.serialize_just_login()), 200
+
+@app.route ("/categories", methods=["POST", "GET"])
+def categories():
+    if request.method == "POST":
+        category = Category()
+        category.name = request.json.get("name")
+        category_exist = Category.query.filter_by(name=request.json.get("name")).first()
+        if category_exist is not None:
+            return jsonify("Categoría ya existe"), 400
+
+        db.session.add(category)
+        db.session.commit()
+
+        return jsonify("Categoría creada"), 200
+
+    else:
+        _category = Category.query.all()
+        categories_list = [_category.serialize() for _category in _category]
+        return jsonify(categories_list), 200
 
 
 @app.route ("/categorias", methods=["GET", "POST"])
@@ -57,7 +76,7 @@ def seller():
         seller.phonenumber = request.json.get("phonenumber")
         seller.storename = request.json.get("storename")       
         seller.link = request.json.get("link")
-        seller.category = request.json.get("category")
+        seller.category_id = request.json.get("category_id")
 
         db.session.add(seller)
         db.session.commit()

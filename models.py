@@ -14,11 +14,12 @@ class Seller(db.Model):
     phonenumber = db.Column(db.String(15), nullable=False)
     storename = db.Column(db.String(30), nullable=False)   
     link = db.Column(db.String(100), nullable=False)
-    category = db.Column(db.String(20), nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey("category.id"), nullable=False)
     product = db.relationship("Product", backref=db.backref("seller", lazy = True))
     favorite = db.relationship("Favorite", backref=db.backref("seller", lazy = True))
     dispatch = db.relationship("Dispatch", backref=db.backref("seller", lazy = True))
     balance = db.relationship("Balance", backref=db.backref("seller", lazy = True))
+
 
     def __repr__(self):
         return "<Seller %r>" % self.id
@@ -34,7 +35,7 @@ class Seller(db.Model):
             'phonenumber': self.phonenumber,
             'storename' : self.storename,           
             'link': self.link,
-            'category': self.category
+            'category': self.category_id
         }
     def serialize_just_name(self):
         return {
@@ -42,7 +43,7 @@ class Seller(db.Model):
             'firstname': self.firstname,
             'lastname': self.lastname,
             'storename': self.storename,
-            'category': self.category
+            'category': self.category_id
         }
 
 
@@ -255,4 +256,18 @@ class Balance(db.Model):
             'current_balance': self.current_balance,
             'last_deposit': self.last_deposit,
             'last_withdraw': self.last_withdraw
+        }
+
+class Category(db.Model):
+    id=db.Column(db.Integer, primary_key=True)
+    name=db.Column(db.String(20), nullable=False, unique=True)
+    seller=db.relationship("Seller", backref="category", lazy=True)
+
+    def __repr__(self):
+        return "<Category %r>" % self.id
+    
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name
         }
