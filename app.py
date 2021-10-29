@@ -102,9 +102,8 @@ def product():
     else:
         product = Product()
         product.sellerID = request.json.get("sellerID")
-        product.store_name = request.json.get("store_name")
         product.item_title = request.json.get("item_title")
-        product.item_photo = request.json.get("item_photo")
+        product.file = request.json.get("file")
         product.item_description = request.json.get("item_description")
         product.item_stock = request.json.get("item_stock")
         product.item_price = request.json.get("item_price")
