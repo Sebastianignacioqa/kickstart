@@ -5,7 +5,7 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:admin@localhost:5432/kickstart3'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:admin@localhost:5432/kickstart4'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True
 db.init_app(app)
@@ -52,11 +52,11 @@ def categorias():
             return jsonify("Categoría no válida"), 400
         else:
             arreglo=[]
-            categorias = Seller.query.filter_by(category=categoria).all()
+            categorias = Seller.query.filter_by(category_id=categoria).all()
             if categorias is None:
                 return jsonify("No existen tiendas"), 200
-            for category in categorias:
-                arreglo.append(category.storename)
+            for category_id in categorias:
+                arreglo.append(category_id.storename)
             return jsonify(arreglo), 200
             
 
