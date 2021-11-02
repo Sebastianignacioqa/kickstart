@@ -5,12 +5,15 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_jwt_extended import create_access_token
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from flask_wtf import Form
 from wtforms import StringField
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms.validators import DataRequired, Email
 import os
+from flask_bcrypt import Bcrypt
+import re
+from datetime import datetime
 
 UPLOAD_FOLDER = 'documents'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -21,13 +24,15 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True
 app.config["JWT_SECRET_KEY"] = "super-secret"
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
+app.config["SECRET_KEY"] = "other-super-secret"
 
 
 
 db.init_app(app)
 Migrate(app, db)
 CORS(app)
+jwt = JWTManager(app)
+bcrypt = Bcrypt(app)
 
 class DocumentUploadForm(Form):
     first_name = StringField("First Name", validators=[DataRequired()])
@@ -43,19 +48,50 @@ def seller():
         return jsonify(seller.serialize()), 200
     else:
         seller = Seller()
-        seller.firstname = request.json.get("firstname")
-        seller.lastname = request.json.get("lastname")
-        seller.rut = request.json.get("rut")
-        seller.store_name = request.json.get("store_name")
-        seller.password = request.json.get("password")
-        seller.email = request.json.get("email")
-        seller.link = request.json.get("link")
-        
+        firstname = request.json.get("firstname")
+        lastname = request.json.get("lastname")
+        rut = request.json.get("rut")
+        store_name = request.json.get("store_name")
+        password = request.json.get("password")
+        email = request.json.get("email")
+        link = request.json.get("link")
 
-        db.session.add(seller)
-        db.session.commit()
+        seller= Seller.query.filter_by(rut=rut).first()
+        if seller is None:
+            seller = Seller()
+            seller.firstname = firstname
+            seller.lastname = lastname
+            #Validating rut
+            rut_regex = '^(\d{2}\\d{3}\\d{3}-)([a-zA-Z]{1}$|\d{1}$)'
+            if re.search(rut_regex, rut):
+                seller.rut = rut
+            else:
+                return jsonify({
+                    "msg": "El RUT no es valido"
+                }), 400
+            seller.store_name = store_name
+            #validating password
+            password_regex = '^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$'
+            if re.search(password_regex, password):
+                password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+                seller.password = password_hash
+            else:
+                return jsonify({
+                    "msg": "El password no es valido"
+                }), 400
+            seller.email = email
+            seller.link = link
 
-    return jsonify(seller.serialize()), 200
+            db.session.add(seller)
+            db.session.commit()
+
+            return jsonify({
+                "msg": "Vendedor registrado corectamente"
+            }),200
+        else:
+            return jsonify({
+                "msg": "El vendedor ya se encuentra registrado"
+            }),400
 
 @app.route ("/buyer", methods=["GET", "POST"])
 def buyer():
@@ -64,18 +100,46 @@ def buyer():
         return jsonify(buyer.serialize()), 200
     else:
         buyer = Buyer()
-        buyer.firstname = request.json.get("firstname")
-        buyer.lastname = request.json.get("lastname")
-        buyer.rut = request.json.get("rut")
-        buyer.password = request.json.get("password")
-        buyer.email = request.json.get("email")
-        
-        
+        firstname = request.json.get("firstname")
+        lastname = request.json.get("lastname")
+        rut = request.json.get("rut")
+        password = request.json.get("password")
+        email = request.json.get("email")
 
-        db.session.add(buyer)
-        db.session.commit()
+        buyer= Buyer.query.filter_by(rut=rut).first()
+        if buyer is None:
+            buyer = Buyer()
+            buyer.firstname = firstname
+            buyer.lastname = lastname
+            #Validating rut
+            rut_regex = '^(\d{2}\\d{3}\\d{3}-)([a-zA-Z]{1}$|\d{1}$)'
+            if re.search(rut_regex, rut):
+                buyer.rut = rut
+            else:
+                return jsonify({
+                    "msg": "El RUT no es valido"
+                }), 400
+            #validating password
+            password_regex = '^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$'
+            if re.search(password_regex, password):
+                password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+                buyer.password = password_hash
+            else:
+                return jsonify({
+                    "msg": "El password no es valido"
+                }), 400
+            buyer.email = email
 
-    return jsonify(buyer.serialize()), 200
+            db.session.add(buyer)
+            db.session.commit()
+
+            return jsonify({
+                "msg": "Comprador registrado corectamente"
+            }),200
+        else:
+            return jsonify({
+                "msg": "El Comprador ya se encuentra registrado"
+            }),400
 
 @app.route ("/sale", methods=["GET", "POST"])
 def sale():
@@ -123,10 +187,49 @@ def login():
         return jsonify(seller.serialize()), 200
     else:
         seller = Seller()
-        seller.rut = request.json.get("rut")
-        seller.password = request.json.get("password")
+        rut = request.json.get("rut")
+        password = request.json.get("password")
 
-    return jsonify(seller.serialize_just_login()), 200
+        if password == "":
+            return jsonify({
+                "msg": "Debes ingresar un password valido"
+            }), 400
+        if rut == "":
+            return jsonify({
+                "msg": "Debes ingresar un RUT valido"
+            }), 400   
+
+        seller = Seller.query.filter_by(rut=rut).first()
+
+        if seller is None:
+           return jsonify({
+                "msg": "Este vendedor no existe, debes registrarte"
+            }), 400
+        elif bcrypt.check_password_hash(seller.password, password):
+            access_token = create_access_token(identity=seller.rut)
+            return jsonify({
+                "msg": "User login success",
+                "access_token": access_token,
+                "seller": seller.serialize_just_login()
+            }), 200
+        else:
+            return jsonify({
+                "msg": "Credenciales erroneas"
+            }), 400
+
+
+
+@app.route ("/log", methods=["POST"])
+@jwt_required()
+def log(): 
+    current_user = get_jwt_identity()
+    current_user_token_expires = get_jwt()["exp"]
+    return jsonify({
+        "current_user" : current_user,
+        "current_user_token_expires": datetime.fromtimecodstamp(current_user_token_expires)
+    }),200
+
+
     
 
 @app.route ("/login2", methods=["GET", "POST"])
@@ -136,21 +239,35 @@ def login2():
         return jsonify(buyer.serialize()), 200
     else:
         buyer = Buyer()
-        buyer.rut = request.json.get("rut")
-        buyer.password = request.json.get("password")
+        rut = request.json.get("rut")
+        password = request.json.get("password")
 
-    return jsonify(buyer.serialize_just_login()), 200
+        if password == "":
+            return jsonify({
+                "msg": "Debes ingresar un password valido"
+            }), 400
+        if rut == "":
+            return jsonify({
+                "msg": "Debes ingresar un RUT valido"
+            }), 400   
 
-@app.route('/post')
-def index():
-    return "El documento fue adjunto satisfactoriamente"
+        buyer = Buyer.query.filter_by(rut=rut).first()
 
-@app.route('/post', methods=['POST'])
-def upload_files():
-    for uploaded_file in request.files.getlist('file'):
-        if uploaded_file.filename != '':
-            uploaded_file.save(os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename))
-    return "El documento fue adjunto satisfactoriamente"
+        if buyer is None:
+           return jsonify({
+                "msg": "Este comprador no existe, debes registrarte"
+            }), 400
+        elif bcrypt.check_password_hash(buyer.password, password):
+            access_token = create_access_token(identity=buyer.rut)
+            return jsonify({
+                "msg": "User login success",
+                "access_token": access_token,
+                "buyer": buyer.serialize_just_login()
+            }), 200
+        else:
+            return jsonify({
+                "msg": "Credenciales erroneas"
+            }), 400
 
 if __name__== "__main__":
     app.run(host='localhost', port = 8080)

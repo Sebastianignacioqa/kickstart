@@ -8,7 +8,7 @@ class Seller(db.Model):
     lastname = db.Column(db.String(50), nullable=False)
     rut = db.Column(db.String(10), nullable=False)
     store_name = db.Column(db.String(50), nullable=False)
-    password = db.Column(db.String, nullable=False)
+    password = db.Column(db.String(250), nullable=False)
     email = db.Column(db.String(50), nullable=False)
     link = db.Column(db.String(100), nullable=False)
     product = db.relationship("Product", backref=db.backref("seller", lazy = True))
@@ -30,8 +30,9 @@ class Seller(db.Model):
         }
     def serialize_just_login(self):
         return {
-            'rut': self.rut,
-            'password': self.password,
+            'firstname': self.firstname,
+            'lastname': self.lastname,
+            'store_name': self.store_name
         }
 
 class Buyer(db.Model):
@@ -58,8 +59,8 @@ class Buyer(db.Model):
         }
     def serialize_just_login(self):
         return {
-            'rut': self.rut,
-            'password': self.password
+            'firstname': self.firstname,
+            'lastname': self.lastname,
         }
 
 class Sale(db.Model):
