@@ -165,20 +165,16 @@ def product():
         return jsonify(product.serialize()), 200
     else:
         product = Product()
-        product.sellerID = request.json.get("sellerID")
         product.item_title = request.json.get("item_title")
-        product.file = request.json.get("file")
         product.item_description = request.json.get("item_description")
         product.item_stock = request.json.get("item_stock")
         product.item_price = request.json.get("item_price")
         product.category = request.json.get("category")
-
-        
-
+    
         db.session.add(product)
         db.session.commit()
 
-    return jsonify(product.serialize()), 200
+        return jsonify({"msg": "Ok"}),200
 
 @app.route ("/login", methods=["GET", "POST"])
 def login():
@@ -204,7 +200,7 @@ def login():
         if seller is None:
            return jsonify({
                 "msg": "Este vendedor no existe, debes registrarte"
-            }), 400
+            }), 401
         elif bcrypt.check_password_hash(seller.password, password):
             access_token = create_access_token(identity=seller.rut)
             return jsonify({
@@ -229,8 +225,22 @@ def log():
         "current_user_token_expires": datetime.fromtimecodstamp(current_user_token_expires)
     }),200
 
+@app.route ("/wishlist", methods=["GET", "POST"])
+def wishlist():
+    if request.method == "GET":
+        product = Product.query.get(1)
+        return jsonify(product.serialize()), 200
+    else:
+        product = Product()
+        product.item_title = request.json.get("item_title")
+        product.item_description = request.json.get("item_description")
+        product.item_stock = request.json.get("item_stock")
+        product.item_price = request.json.get("item_price")
+        product.category = request.json.get("category")
 
-    
+        db.session.add(product)
+        db.session.commit()
+    return jsonify({"msg": "Ok"}),200
 
 @app.route ("/login2", methods=["GET", "POST"])
 def login2():
@@ -245,7 +255,7 @@ def login2():
         if password == "":
             return jsonify({
                 "msg": "Debes ingresar un password valido"
-            }), 400
+            }), 401
         if rut == "":
             return jsonify({
                 "msg": "Debes ingresar un RUT valido"
@@ -268,6 +278,13 @@ def login2():
             return jsonify({
                 "msg": "Credenciales erroneas"
             }), 400
+
+@app.route('/post', methods=['POST'])
+def upload_files():
+    for uploaded_file in request.files.getlist('file'):
+        if uploaded_file.filename != '':
+            uploaded_file.save(os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename))
+    return "El documento fue adjunto satisfactoriamente"
 
 if __name__== "__main__":
     app.run(host='localhost', port = 8080)

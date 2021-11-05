@@ -98,9 +98,8 @@ class Product(db.Model):
     id= db.Column(db.Integer, primary_key=True)
     sellerID = db.Column(db.Integer, db.ForeignKey('seller.id'))
     item_title = db.Column(db.String(50), nullable=False)
-    file = db.Column(db.String(250))
     item_description = db.Column(db.String(250), nullable=False)
-    item_stock = db.Column(db.String(15), nullable=False)
+    item_stock = db.Column(db.Integer, nullable=False)
     item_price = db.Column(db.Integer, nullable=False)
     category = db.Column(db.String(50), nullable=False)
     
@@ -114,7 +113,6 @@ class Product(db.Model):
             'id': self.id,
             'sellerID': self.sellerID,
             'item_title': self.item_title,
-            'file': self.file,
             'item_description': self.item_description,
             'item_stock': self.item_stock,
             'item_price': self.item_price,
