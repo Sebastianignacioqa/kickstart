@@ -117,7 +117,8 @@ def product():
         product.item_description = request.json.get("item_description")
         product.item_stock = request.json.get("item_stock")
         product.item_price = request.json.get("item_price")
-        product.category = request.json.get("category")
+        product.category_id = request.json.get("category_id")
+        product.sellerID = request.json.get("sellerID")
     
         db.session.add(product)
         db.session.commit()
@@ -154,7 +155,7 @@ def login():
             return jsonify({
                 "msg": "User login success",
                 "access_token": access_token,
-                "seller": seller.serialize_just_login()
+                "seller": seller.serialize_just_id()
             }), 200
         else:
             return jsonify({
@@ -170,7 +171,7 @@ def log():
     current_user_token_expires = get_jwt()["exp"]
     return jsonify({
         "current_user" : current_user,
-        "current_user_token_expires": datetime.fromtimecodstamp(current_user_token_expires)
+        "current_user_token_expires": datetime.fromtimestamp(current_user_token_expires)
     }),200
 
 @app.route ("/wishlist", methods=["GET", "POST"])
@@ -276,17 +277,16 @@ def seller():
         seller = Seller.query.get(1)
         return jsonify(seller.serialize()), 200
     else:
-        seller = Seller()
-        seller.firstname = request.json.get("firstname")
-        seller.lastname = request.json.get("lastname")
-        seller.rut = request.json.get("rut")
-        seller.email = request.json.get("email")
-        seller.password = request.json.get("password")
-        seller.address = request.json.get("address")
-        seller.phonenumber = request.json.get("phonenumber")
-        seller.storename = request.json.get("storename")       
-        seller.link = request.json.get("link")
-        seller.category_id = request.json.get("category_id")
+        firstname = request.json.get("firstname")
+        lastname = request.json.get("lastname")
+        rut = request.json.get("rut")
+        email = request.json.get("email")
+        password = request.json.get("password")
+        address = request.json.get("address")
+        phonenumber = request.json.get("phonenumber")
+        storename = request.json.get("storename")       
+        link = request.json.get("link")
+        category_id = request.json.get("category_id")
 
         seller= Seller.query.filter_by(rut=rut).first()
         if seller is None:
@@ -301,7 +301,7 @@ def seller():
                 return jsonify({
                     "msg": "El RUT no es valido"
                 }), 400
-            seller.store_name = store_name
+            seller.storename = storename
             #validating password
             password_regex = '^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$'
             if re.search(password_regex, password):
@@ -313,6 +313,9 @@ def seller():
                 }), 400
             seller.email = email
             seller.link = link
+            seller.address = address
+            seller.phonenumber = phonenumber
+            seller.category_id = category_id
 
             db.session.add(seller)
             db.session.commit()

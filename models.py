@@ -6,12 +6,12 @@ class Seller(db.Model):
     id= db.Column(db.Integer, primary_key=True)
     firstname = db.Column(db.String(50), nullable=False)
     lastname = db.Column(db.String(50), nullable=False)
-    rut = db.Column(db.String(12), nullable=False)
+    rut = db.Column(db.String(11), nullable=False)
     email = db.Column(db.String(30), nullable=False)
-    password = db.Column(db.String(20), nullable=False)
+    password = db.Column(db.String(250), nullable=False)
     address = db.Column(db.String(50), nullable=False)
     phonenumber = db.Column(db.String(15), nullable=False)
-    storename = db.Column(db.String(30), nullable=False)   
+    storename = db.Column(db.String(50), nullable=False)   
     link = db.Column(db.String(100), nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey("category.id"), nullable=False)
     product = db.relationship("Product", backref=db.backref("seller", lazy = True))
@@ -29,16 +29,14 @@ class Seller(db.Model):
             'firstname': self.firstname,
             'lastname': self.lastname,
             'rut': self.rut,
-            'store_name' : self.store_name,
+            'storename' : self.storename,
             'password': self.password,
             'email': self.email,
             'link': self.link
         }
-    def serialize_just_login(self):
+    def serialize_just_id(self):
         return {
-            'firstname': self.firstname,
-            'lastname': self.lastname,
-            'store_name': self.store_name
+            'id': self.id,
         }
 
 class Buyer(db.Model):
@@ -104,12 +102,12 @@ class Sale(db.Model):
 class Product(db.Model):
     __tablename__= 'product'
     id= db.Column(db.Integer, primary_key=True)
-    sellerID = db.Column(db.Integer, db.ForeignKey('seller.id'))
+    sellerID = db.Column(db.Integer, db.ForeignKey('seller.id'), nullable=False)
     item_title = db.Column(db.String(50), nullable=False)
     item_description = db.Column(db.String(250), nullable=False)
     item_stock = db.Column(db.Integer, nullable=False)
     item_price = db.Column(db.Integer, nullable=False)
-    category = db.Column(db.String(50), nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey("category.id"), nullable=False)
     images = db.relationship("Images", backref=db.backref("product", lazy = True))
     
     
@@ -125,7 +123,7 @@ class Product(db.Model):
             'item_description': self.item_description,
             'item_stock': self.item_stock,
             'item_price': self.item_price,
-            'category': self.category
+            'category_id': self.category_id
         }
     def serialize_just_name(self):
         return {
@@ -157,6 +155,7 @@ class Category(db.Model):
     id=db.Column(db.Integer, primary_key=True)
     name=db.Column(db.String(20), nullable=False, unique=True)
     seller=db.relationship("Seller", backref="category", lazy=True)
+    product=db.relationship("Product", backref="category", lazy=True)
 
     def __repr__(self):
         return "<Category %r>" % self.id
