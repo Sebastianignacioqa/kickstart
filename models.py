@@ -45,6 +45,10 @@ class Seller(db.Model):
             'storename': self.storename,
             'category': self.category_id
         }
+    def serialize_storename(self):
+        return {
+            'storename': self.storename
+        }
 
 
 class Buyer(db.Model):
