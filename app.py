@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request, render_template, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
-from models import db, Seller, Buyer, Sale, Product, Images, Favorite, Category, Balance, Payment, Dispatch
+from models import db, Seller, Buyer, Sale, Product, Images, Favorite, Category, Balance, Payment, Dispatch, Wishlist
 from flask_migrate import Migrate
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
@@ -109,8 +109,10 @@ def sale():
 @app.route ("/product", methods=["GET", "POST"])
 def product():
     if request.method == "GET":
-        product = Product.query.get(1)
-        return jsonify(product.serialize()), 200
+        _product = Product.query.all()
+        products_list = [_product.serialize_just_sell() for _product in _product]
+        return jsonify(products_list), 200
+
     else:
         product = Product()
         product.item_title = request.json.get("item_title")
@@ -177,19 +179,18 @@ def log():
 @app.route ("/wishlist", methods=["GET", "POST"])
 def wishlist():
     if request.method == "GET":
-        product = Product.query.get(1)
-        return jsonify(product.serialize()), 200
-    else:
-        product = Product()
-        product.item_title = request.json.get("item_title")
-        product.item_description = request.json.get("item_description")
-        product.item_stock = request.json.get("item_stock")
-        product.item_price = request.json.get("item_price")
-        product.category = request.json.get("category")
+        _wishlist = Wishlist.query.all()
+        wishlist_list = [_wishlist.serialize() for _wishlist in _wishlist]
+        return jsonify(wishlist_list), 200
 
-        db.session.add(product)
+    else:
+        wishlist = Wishlist()
+        wishlist.sellerID = request.json.get("sellerID")
+    
+        db.session.add(wishlist)
         db.session.commit()
-    return jsonify({"msg": "Ok"}),200
+
+        return jsonify({"msg": "Ok"}),200
 
 @app.route ("/login2", methods=["GET", "POST"])
 def login2():
