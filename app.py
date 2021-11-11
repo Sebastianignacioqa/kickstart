@@ -41,7 +41,7 @@ class DocumentUploadForm(Form):
     document = FileField("Document", validators=[FileRequired(), FileAllowed(['png', 'jpg', 'jpeg', 'gif'], 'IMAGE ONLY')])
 
 
-@app.route ("/buyer", methods=["GET", "POST"])
+@app.route ("/registrocomprador", methods=["GET", "POST"])
 def buyer():
     if request.method == "GET":
         buyer = Buyer.query.get(1)
@@ -222,7 +222,7 @@ def login2():
             return jsonify({
                 "msg": "User login success",
                 "access_token": access_token,
-                "buyer": buyer.serialize_just_login()
+                "buyer": buyer.serialize_just_id()
             }), 200
         else:
             return jsonify({
