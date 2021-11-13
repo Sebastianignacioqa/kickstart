@@ -14,8 +14,11 @@ import os
 from flask_bcrypt import Bcrypt
 import re
 from datetime import datetime
+import mercadopago
+from flask import send_from_directory
 
 UPLOAD_FOLDER = 'documents'
+
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 app = Flask(__name__)
@@ -24,8 +27,9 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True
 app.config["JWT_SECRET_KEY"] = "super-secret"
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['UPLOAD_PATH'] = 'documents'
 app.config["SECRET_KEY"] = "other-super-secret"
-
+sdk=mercadopago.SDK("")
 
 
 db.init_app(app)
@@ -127,6 +131,8 @@ def product():
 
         return jsonify({"msg": "Ok"}),200
 
+        
+
 @app.route ("/login", methods=["GET", "POST"])
 def login():
     if request.method == "GET":
@@ -164,6 +170,23 @@ def login():
                 "msg": "Credenciales erroneas"
             }), 400
 
+#@app.route ("/payment", methods=["POST"])
+#def payment():
+   # preference_data = {
+    #"items": [
+    #{
+    #"title": "",
+   # "quantity": ,
+    #"unit_price": 
+    #}
+    #]
+    #}
+    #preference_response = sdk.preference().create(preference_data)
+    #preference = preference_response["response"]
+
+from flask import send_from_directory
+
+
 
 
 @app.route ("/log", methods=["POST"])
@@ -176,21 +199,27 @@ def log():
         "current_user_token_expires": datetime.fromtimestamp(current_user_token_expires)
     }),200
 
-@app.route ("/wishlist", methods=["GET", "POST"])
-def wishlist():
-    if request.method == "GET":
-        _wishlist = Wishlist.query.all()
-        wishlist_list = [_wishlist.serialize() for _wishlist in _wishlist]
-        return jsonify(wishlist_list), 200
+#@app.route ("/wishlist", methods=["GET", "POST"])
+#def product():
+    #if request.method == "GET":
+       # product = Product()
+       # product = Product.query.filter_by(id=)
+       # products_list = [_product.serialize_just_sell() for _product in _product]
+       # return jsonify(products_list), 200
 
-    else:
-        wishlist = Wishlist()
-        wishlist.sellerID = request.json.get("sellerID")
+   # else:
+       # product = Product()
+       # product.item_title = request.json.get("item_title")
+       # product.item_description = request.json.get("item_description")
+        #product.item_stock = request.json.get("item_stock")
+        #product.item_price = request.json.get("item_price")
+        #product.category_id = request.json.get("category_id")
+        #product.sellerID = request.json.get("sellerID")
     
-        db.session.add(wishlist)
-        db.session.commit()
+    #    db.session.add(product)
+     #   db.session.commit()
 
-        return jsonify({"msg": "Ok"}),200
+      #  return jsonify({"msg": "Ok"}),200
 
 @app.route ("/login2", methods=["GET", "POST"])
 def login2():
@@ -236,6 +265,11 @@ def upload_files():
             uploaded_file.save(os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename))
             
     return "El documento fue adjunto satisfactoriamente"
+
+@app.route('/documents/<filename>')
+def upload(filename):
+    return send_from_directory(app.config['UPLOAD_PATH'], filename)
+
 
 @app.route ("/categories", methods=["POST", "GET"])
 def categories():

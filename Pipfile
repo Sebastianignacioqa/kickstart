@@ -15,6 +15,7 @@ flask-wtf = "*"
 flask-uploads = "*"
 email-validator = "*"
 flask-bcrypt = "*"
+mercadopago = "*"
 
 [dev-packages]
 
