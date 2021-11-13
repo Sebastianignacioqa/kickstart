@@ -6,18 +6,19 @@ class Seller(db.Model):
     id= db.Column(db.Integer, primary_key=True)
     firstname = db.Column(db.String(50), nullable=False)
     lastname = db.Column(db.String(50), nullable=False)
-    rut = db.Column(db.String(12), nullable=False)
+    rut = db.Column(db.String(11), nullable=False)
     email = db.Column(db.String(30), nullable=False)
-    password = db.Column(db.String(20), nullable=False)
+    password = db.Column(db.String(250), nullable=False)
     address = db.Column(db.String(50), nullable=False)
     phonenumber = db.Column(db.String(15), nullable=False)
-    storename = db.Column(db.String(30), nullable=False)   
+    storename = db.Column(db.String(50), nullable=False)   
     link = db.Column(db.String(100), nullable=False)
-    category = db.Column(db.String(20), nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey("category.id"), nullable=False)
     product = db.relationship("Product", backref=db.backref("seller", lazy = True))
     favorite = db.relationship("Favorite", backref=db.backref("seller", lazy = True))
     dispatch = db.relationship("Dispatch", backref=db.backref("seller", lazy = True))
     balance = db.relationship("Balance", backref=db.backref("seller", lazy = True))
+    wishlist = db.relationship("Wishlist", backref=db.backref("seller", lazy = True))
     
 
     def __repr__(self):
@@ -29,6 +30,8 @@ class Seller(db.Model):
             'firstname': self.firstname,
             'lastname': self.lastname,
             'rut': self.rut,
+            'storename' : self.storename,
+            'password': self.password,
             'email': self.email,
             'address': self.address,
             'phonenumber': self.phonenumber,
@@ -36,13 +39,10 @@ class Seller(db.Model):
             'link': self.link,
             'category': self.category
         }
-    def serialize_just_name(self):
+    def serialize_just_id(self):
         return {
             'id': self.id,
-            'firstname': self.firstname,
-            'lastname': self.lastname,
-            'storename': self.storename,
-            'category': self.category
+            'storename': self.storename
         }
 
 class Buyer(db.Model):
@@ -51,13 +51,15 @@ class Buyer(db.Model):
     firstname = db.Column(db.String(50), nullable=False)
     lastname = db.Column(db.String(50), nullable=False)
     rut = db.Column(db.String(12), nullable=False)
-    password = db.Column(db.String(20), nullable=False)
+    password = db.Column(db.String(250), nullable=False)
     email = db.Column(db.String(30), nullable=False)
     favorite = db.relationship("Favorite", backref=db.backref("buyer", lazy = True))
     payment = db.relationship("Payment", backref=db.backref("buyer", lazy = True))
+    wishlist = db.relationship("Wishlist", backref=db.backref("buyer", lazy = True))
+    
 
     def __repr__(self):
-        return "<Post %r>" % self.id
+        return "<Buyer %r>" % self.id
 
     def serialize(self):
         return {
@@ -68,15 +70,16 @@ class Buyer(db.Model):
             'password': self.password,
             'email': self.email
         }
-    def serialize_just_name(self):
+    def serialize_just_login(self):
         return {
-            'id': self.id,
             'firstname': self.firstname,
-            'lastname': self.lastname
+            'lastname': self.lastname,
         }
 
-
-
+    def serialize_just_id(self):
+        return {
+            'id': self.id,
+        }
 
 class Sale(db.Model):
     __tablename__ = 'sale'
@@ -89,7 +92,6 @@ class Sale(db.Model):
     seller = db.relationship("Seller", backref=db.backref("seller", lazy = True))
     buyer = db.relationship("Buyer", backref=db.backref("buyer", lazy = True)) 
     product = db.relationship("Product", backref=db.backref("product", lazy = True))
-     
 
     def __repr__(self):
         return "<Sale %r>" % self.id
@@ -99,27 +101,29 @@ class Sale(db.Model):
             'id': self.id,
             'sellerID': self.sellerID,
             'buyerID': self.buyerID,
-            'productID': self.productID,
+            'postID': self.postID,
             'item_title': self.item_title,
             'item_price': self.item_price
         }
     def serialize_just_name(self):
         return {
             'id': self.id,
-            'sellerID': self.sellerID
+            'sellerID': self.sellerID,
+            
         }
-
-
 class Product(db.Model):
     __tablename__= 'product'
     id= db.Column(db.Integer, primary_key=True)
-    sellerID = db.Column(db.Integer, db.ForeignKey('seller.id'))
-    storename = db.Column(db.String(30), nullable=False)
+    sellerID = db.Column(db.Integer, db.ForeignKey('seller.id'), nullable=False)
     item_title = db.Column(db.String(50), nullable=False)
-    item_photo = db.Column(db.String(250), nullable=False)
     item_description = db.Column(db.String(250), nullable=False)
     item_stock = db.Column(db.Integer, nullable=False)
     item_price = db.Column(db.Integer, nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey("category.id"), nullable=False)
+    images = db.relationship("Images", backref=db.backref("product", lazy = True))
+    wishlist = db.relationship("Wishlist", backref=db.backref("product", lazy = True))
+    
+    
 
     def __repr__(self):
         return "<Product %r>" % self.id
@@ -128,22 +132,34 @@ class Product(db.Model):
         return {
             'id': self.id,
             'sellerID': self.sellerID,
-            'storename': self.storename,
             'item_title': self.item_title,
-            'item_photo': self.item_photo,
             'item_description': self.item_description,
             'item_stock': self.item_stock,
-            'item_price': self.item_price
+            'item_price': self.item_price,
+            'category_id': self.category_id
         }
-
     def serialize_just_name(self):
         return {
             'id': self.id,
             'sellerID': self.sellerID,
-            'storename': self.storename,
+            'store_name': self.store_name,
             'item_title': self.item_title
         }
+    def serialize_just_sell(self):
+        return {
+            'id': self.id,
+            'item_title': self.item_title,
+            'item_price': self.item_price
+        }
 
+class Images(db.Model):
+    __tablename__= 'images'
+    id= db.Column(db.Integer, primary_key=True)
+    productid = db.Column(db.Integer, db.ForeignKey('product.id'))
+    imagenes = db.Column(db.String(250))
+
+    def __repr__(self):
+        return "<Images %r>" % self.id
 
 class Favorite(db.Model):
     __tablename__= 'favorite'
@@ -171,6 +187,38 @@ class Favorite(db.Model):
             'storename': self.storename
         }
 
+class Wishlist(db.Model):
+    __tablename__= 'wishlist'
+    id = db.Column(db.Integer, primary_key=True)
+    sellerID = db.Column(db.Integer, db.ForeignKey('seller.id'), nullable=False)
+    productID = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    buyerID = db.Column(db.Integer, db.ForeignKey('buyer.id'))
+    
+
+    def __repr__(self):
+        return "<Wishlist %r>" % self.id
+    
+    def serialize(self):
+        return {
+            'sellerID': self.sellerID,
+            'productID': self.productID,
+            'buyerID': self.buyerID
+        }
+
+class Category(db.Model):
+    id=db.Column(db.Integer, primary_key=True)
+    name=db.Column(db.String(20), nullable=False, unique=True)
+    seller=db.relationship("Seller", backref="category", lazy=True)
+    product=db.relationship("Product", backref="category", lazy=True)
+
+    def __repr__(self):
+        return "<Category %r>" % self.id
+    
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name
+        }
 
 class Payment(db.Model):
     __tablename__= 'payment'
@@ -227,22 +275,18 @@ class Dispatch(db.Model):
         }
 
 
-
-
 class Balance(db.Model):
-    __tablename__ = 'balance'
+    __tablename__= 'balance'
     id= db.Column(db.Integer, primary_key=True)
-    storename = db.Column(db.String(30), nullable=False)
-    current_balance = db.Column(db.Integer)
-    last_deposit = db.Column(db.Integer)
-    last_withdraw = db.Column(db.Integer)
     sellerID = db.Column(db.Integer, db.ForeignKey('seller.id'))
-    seller = db.relationship("Seller", backref=db.backref("seller", lazy = True))
-    
+    storename = db.Column(db.String(30), nullable=False)
+    current_balance = db.Column(db.Integer, nullable=False)
+    last_deposit = db.Column(db.Integer, nullable=False)
+    last_withdraw = db.Column(db.Integer, nullable=False)
     
 
     def __repr__(self):
-        return "<Post %r>" % self.id
+        return "<Balance %r>" % self.id
 
     def serialize(self):
         return {
@@ -251,10 +295,9 @@ class Balance(db.Model):
             'storename': self.storename,
             'current_balance': self.current_balance,
             'last_deposit': self.last_deposit,
-            'last_withdraw': self.last_withdraw,
-            
-            
+            'last_withdraw': self.last_withdraw
         }
+
     def serialize_just_name(self):
         return {
             'id': self.id,
@@ -262,5 +305,4 @@ class Balance(db.Model):
             'current_balance': self.current_balance,
             'last_deposit': self.last_deposit,
             'last_withdraw': self.last_withdraw
-            
         }
