@@ -17,6 +17,7 @@ from datetime import datetime
 import mercadopago
 from flask import send_from_directory
 
+
 UPLOAD_FOLDER = 'documents'
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -114,7 +115,7 @@ def sale():
 def product():
     if request.method == "GET":
         _product = Product.query.all()
-        products_list = [_product.serialize_just_sell() for _product in _product]
+        products_list = [_product.serialize_just_name() for _product in _product]
         return jsonify(products_list), 200
 
     else:
@@ -131,7 +132,12 @@ def product():
 
         return jsonify({"msg": "Ok"}),200
 
-        
+@app.route ("/storename", methods=["GET"])
+def storename():
+    if request.method == "GET":
+        _seller = Seller.query.all()
+        seller_list = [_seller.serialize_just_storename() for _seller in _seller]
+        return jsonify(seller_list), 200        
 
 @app.route ("/login", methods=["GET", "POST"])
 def login():
@@ -184,7 +190,7 @@ def login():
     #preference_response = sdk.preference().create(preference_data)
     #preference = preference_response["response"]
 
-from flask import send_from_directory
+
 
 
 

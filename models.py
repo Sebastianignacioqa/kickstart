@@ -40,6 +40,10 @@ class Seller(db.Model):
             'id': self.id,
             'storename': self.storename
         }
+    def serialize_just_storename(self):
+        return {
+            'storename': self.storename
+        }
 
 class Buyer(db.Model):
     __tablename__ = 'buyer'
@@ -138,8 +142,10 @@ class Product(db.Model):
         return {
             'id': self.id,
             'sellerID': self.sellerID,
-            'store_name': self.store_name,
-            'item_title': self.item_title
+            'item_title': self.item_title,
+            'item_description': self.item_description,
+            'item_stock': self.item_stock,
+            'item_price': self.item_price
         }
     def serialize_just_sell(self):
         return {
