@@ -18,7 +18,6 @@ import mercadopago
 from flask import send_from_directory
 
 UPLOAD_FOLDER = 'documents'
-
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 app = Flask(__name__)
@@ -29,7 +28,7 @@ app.config["JWT_SECRET_KEY"] = "super-secret"
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['UPLOAD_PATH'] = 'documents'
 app.config["SECRET_KEY"] = "other-super-secret"
-sdk=mercadopago.SDK("")
+sdk=mercadopago.SDK("TEST-92550965623394-111201-15d34088f585edbda78b8842d42cfa0d-439478684")
 
 
 db.init_app(app)
@@ -94,7 +93,7 @@ def buyer():
             }),400
 
 @app.route ("/sale", methods=["GET", "POST"])
-def new_sale():
+def sale():
     if request.method == "GET":
         sale = Sale.query.get(1)
         return jsonify(sale.serialize()), 200
@@ -110,8 +109,30 @@ def new_sale():
 
     return jsonify(sale.serialize()), 200
 
+#@app.route ("/pago", methods=["POST"])
+#def payment():
+ #  preference_data = {
+#    "items": [
+#    {
+ #   "title": request.json.get("item_title"),
+#   #"quantity": item_stock ,
+ #   "unit_price": request.json.get("item_price") 
+ #   }
+ #   ]
+ #   }
+    
+ #   preference_response = sdk.preference().create(preference_data)
+ #   preference = preference_response["response"]
+
+ #   db.session.add(payment)
+ #   db.session.commit()
+
+ #   return jsonify(payment.serialize()), 200
+
+
+
 @app.route ("/product", methods=["GET", "POST"])
-def new_product():
+def product():
     if request.method == "GET":
         _product = Product.query.all()
         products_list = [_product.serialize_just_sell() for _product in _product]
@@ -130,8 +151,6 @@ def new_product():
         db.session.commit()
 
         return jsonify({"msg": "Ok"}),200
-
-        
 
 @app.route ("/login", methods=["GET", "POST"])
 def login():
@@ -170,23 +189,6 @@ def login():
                 "msg": "Credenciales erroneas"
             }), 400
 
-#@app.route ("/payment", methods=["POST"])
-#def payment():
-   # preference_data = {
-    #"items": [
-    #{
-    #"title": "",
-   # "quantity": ,
-    #"unit_price": 
-    #}
-    #]
-    #}
-    #preference_response = sdk.preference().create(preference_data)
-    #preference = preference_response["response"]
-
-from flask import send_from_directory
-
-
 
 
 @app.route ("/log", methods=["POST"])
@@ -199,27 +201,21 @@ def log():
         "current_user_token_expires": datetime.fromtimestamp(current_user_token_expires)
     }),200
 
-#@app.route ("/wishlist", methods=["GET", "POST"])
-#def product():
-    #if request.method == "GET":
-       # product = Product()
-       # product = Product.query.filter_by(id=)
-       # products_list = [_product.serialize_just_sell() for _product in _product]
-       # return jsonify(products_list), 200
+@app.route ("/wishlist", methods=["GET", "POST"])
+def wishlist():
+    if request.method == "GET":
+        _wishlist = Wishlist.query.all()
+        wishlist_list = [_wishlist.serialize() for _wishlist in _wishlist]
+        return jsonify(wishlist_list), 200
 
-   # else:
-       # product = Product()
-       # product.item_title = request.json.get("item_title")
-       # product.item_description = request.json.get("item_description")
-        #product.item_stock = request.json.get("item_stock")
-        #product.item_price = request.json.get("item_price")
-        #product.category_id = request.json.get("category_id")
-        #product.sellerID = request.json.get("sellerID")
+    else:
+        wishlist = Wishlist()
+        wishlist.sellerID = request.json.get("sellerID")
     
-    #    db.session.add(product)
-     #   db.session.commit()
+        db.session.add(wishlist)
+        db.session.commit()
 
-      #  return jsonify({"msg": "Ok"}),200
+        return jsonify({"msg": "Ok"}),200
 
 @app.route ("/login2", methods=["GET", "POST"])
 def login2():
@@ -265,11 +261,6 @@ def upload_files():
             uploaded_file.save(os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename))
             
     return "El documento fue adjunto satisfactoriamente"
-
-@app.route('/documents/<filename>')
-def upload(filename):
-    return send_from_directory(app.config['UPLOAD_PATH'], filename)
-
 
 @app.route ("/categories", methods=["POST", "GET"])
 def categories():
@@ -367,121 +358,6 @@ def seller():
 
 
 @app.route ("/favorite", methods=["GET", "POST"])
-def new_favorite():
-    if request.method == "GET":
-        favorite = Favorite.query.get(1)
-        return jsonify(favorite.serialize()), 200
-    else:
-        favorite = Favorite()
-        favorite.buyerID = request.json.get("buyerID")
-        favorite.sellerID = request.json.get("sellerID")
-        favorite.storename = request.json.get("storename")    
-
-        db.session.add(favorite)
-        db.session.commit()
-
-        return jsonify(favorite.serialize()), 200
-
-@app.route ("/payment", methods=["GET", "POST"])
-def new_payment():
-    if request.method == "GET":
-        payment = Payment.query.get(1)
-        return jsonify(payment.serialize()), 200
-    else:
-        payment = Payment()
-        payment.buyerID = request.json.get("buyerID")
-        payment.debit = request.json.get("debit")
-        payment.credit = request.json.get("credit")
-        payment.transfer = request.json.get("transfer")     
-
-        db.session.add(payment)
-        db.session.commit()
-
-        return jsonify(payment.serialize()), 200
-
-@app.route ("/dispatch", methods=["GET", "POST"])
-def new_dispatch():
-    if request.method == "GET":
-        dispatch = Dispatch.query.get(1)
-        return jsonify(dispatch.serialize()), 200
-    else:
-        dispatch = Dispatch()
-        dispatch.sellerID = request.json.get("sellerID")
-        dispatch.in_address = request.json.get("in_address")
-        dispatch.delivery = request.json.get("delivery")   
-
-        db.session.add(dispatch)
-        db.session.commit()
-
-        return jsonify(dispatch.serialize()), 200
-
-@app.route ("/balance", methods=["GET", "POST"])
-def new_balance():
-    if request.method == "GET":
-        balance = Balance.query.get(1)
-        return jsonify(balance.serialize()), 200
-    else:
-        balance = Balance()
-        balance.sellerID = request.json.get("sellerID")
-        balance.storename = request.json.get("storename")
-        balance.current_balance = request.json.get("current_balance")
-        balance.last_deposit = request.json.get("last_deposit")
-        balance.last_withdraw = request.json.get("last_withdraw")        
-
-        db.session.add(balance)
-        db.session.commit()
-
-        return jsonify(balance.serialize()), 200
-
-
-@app.route ("/sale", methods=["GET", "POST"])
-def sale():
-    if request.method == "GET":
-        sale = Sale.query.get(1)
-        return jsonify(sale.serialize()), 200
-    else:
-        sale = Sale()
-        sale.sellerID = request.json.get("sellerID")
-        sale.buyerID = request.json.get("buyerID")
-      
-        db.session.add(sale)
-        db.session.commit()
-
-        return jsonify(sale.serialize()), 200
-
-
-@app.route ("/product", methods=["GET", "POST", "PUT"])
-def product():
-    if request.method == "GET":
-        product = Product.query.get(1)
-        return jsonify(product.serialize()), 200
-        
-    if request.method == "PUT":
-        product = Product.query.get(1)
-        product.item_title = ""
-        product.item_photo = ""
-        product.item_description = ""
-        product.item_stock = ""
-        product.item_price = ""
-
-        db.session.commit()
-    else:
-        product = Product()
-        product.sellerID = request.json.get("sellerID")
-        product.storename = request.json.get("storename")
-        product.item_title = request.json.get("item_title")
-        product.item_photo = request.json.get("item_photo")
-        product.item_description = request.json.get("item_description")
-        product.item_stock = request.json.get("item_stock")
-        product.item_price = request.json.get("item_price")
-
-        db.session.add(product)
-        db.session.commit()
-
-        return jsonify(product.serialize()), 200
-
-
-@app.route ("/favorite", methods=["GET", "POST"])
 def favorite():
     if request.method == "GET":
         favorite = Favorite.query.get(1)
@@ -497,22 +373,22 @@ def favorite():
 
         return jsonify(favorite.serialize()), 200
 
-@app.route ("/payment", methods=["GET", "POST"])
-def payment():
-    if request.method == "GET":
-        payment = Payment.query.get(1)
-        return jsonify(payment.serialize()), 200
-    else:
-        payment = Payment()
-        payment.buyerID = request.json.get("buyerID")
-        payment.debit = request.json.get("debit")
-        payment.credit = request.json.get("credit")
-        payment.transfer = request.json.get("transfer")     
+#@app.route ("/payment", methods=["GET", "POST"])
+#def payment():
+#    if request.method == "GET":
+#        payment = Payment.query.get(1)
+#       return jsonify(payment.serialize()), 200
+#    else:
+#        payment = Payment()
+#        payment.buyerID = request.json.get("buyerID")
+#        payment.debit = request.json.get("debit")
+#        payment.credit = request.json.get("credit")
+#        payment.transfer = request.json.get("transfer")     
 
-        db.session.add(payment)
-        db.session.commit()
+        #db.session.add(payment)
+        #db.session.commit()
 
-        return jsonify(payment.serialize()), 200
+        #return jsonify(payment.serialize()), 200
 
 @app.route ("/dispatch", methods=["GET", "POST"])
 def dispatch():
@@ -530,44 +406,24 @@ def dispatch():
 
         return jsonify(dispatch.serialize()), 200
 
-
-@app.route ("/balance", methods=["GET", "POST", "PUT"])
+@app.route ("/balance", methods=["GET", "POST"])
 def balance():
     if request.method == "GET":
         balance = Balance.query.get(1)
         return jsonify(balance.serialize()), 200
-
-    if request.method == "PUT":
-        balance = Balance.query.get(1)
-        current_balance = ""
-        last_deposit = ""
-        last_withdraw = ""
-        
-        db.session.commit()
-
     else:
         balance = Balance()
         balance.sellerID = request.json.get("sellerID")
         balance.storename = request.json.get("storename")
         balance.current_balance = request.json.get("current_balance")
         balance.last_deposit = request.json.get("last_deposit")
-        balance.last_withdraw = request.json.get("last_withdraw")   
-        
-        
-        
-        
+        balance.last_withdraw = request.json.get("last_withdraw")        
 
         db.session.add(balance)
         db.session.commit()
 
-    return jsonify(balance.serialize()), 200
-
-
+        return jsonify(balance.serialize()), 200
 
 
 if __name__== "__main__":
     app.run(host='localhost', port = 8080)
-
-
-
-
