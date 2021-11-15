@@ -136,7 +136,7 @@ def product():
 def storename():
     if request.method == "GET":
         _seller = Seller.query.all()
-        seller_list = [_seller.serialize_just_storename() for _seller in _seller]
+        seller_list = [_seller.serialize_just_id() for _seller in _seller]
         return jsonify(seller_list), 200        
 
 @app.route ("/login", methods=["GET", "POST"])
@@ -310,6 +310,21 @@ def categorias():
                 return jsonify("No existen tiendas"), 200
             for category_id in categorias:
                 arreglo.append(category_id.storename)
+            return jsonify(arreglo), 200
+
+@app.route ("/profiletienda", methods=["GET", "POST"])
+def profiletienda():
+    if request.method == "POST":
+        profiletienda = request.json.get("profiletienda")
+        if profiletienda is None:
+            return jsonify("Nombre no válido"), 400
+        else:
+            arreglo=[]
+            profiletiendas = Product.query.filter_by(sellerID=profiletienda).all()
+            if profiletiendas is None:
+                return jsonify("No existen tiendas"), 200
+            for sellerID in profiletienda:
+                arreglo.append(sellerID)
             return jsonify(arreglo), 200
 
 @app.route ("/registrotienda", methods=["GET", "POST"])
