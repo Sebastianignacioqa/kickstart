@@ -19,7 +19,7 @@ UPLOAD_FOLDER = 'documents'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:admin@localhost:5432/kickstart5'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:admin@localhost:5432/kickstart6'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True
 app.config["JWT_SECRET_KEY"] = "super-secret"
@@ -37,6 +37,22 @@ class DocumentUploadForm(Form):
     last_name = StringField("Last Name", validators=[DataRequired()])
     email = StringField("Email", validators=[DataRequired(), Email()])
     document = FileField("Document", validators=[FileRequired(), FileAllowed(['png', 'jpg', 'jpeg', 'gif'], 'IMAGE ONLY')])
+
+
+@app.route ("/storename", methods=["GET"])
+def storename():
+    if request.method == "GET":
+        _seller = Seller.query.all()
+        seller_list = [_seller.serialize_just_id() for _seller in _seller]
+        return jsonify(seller_list), 200
+
+
+@app.route ("/sellerid", methods=["GET"])
+def sellerid():
+    if request.method == "GET":
+        _product = Product.query.all()
+        product_id = [_product.serialize_just_sellerID() for _product in _product]
+        return jsonify(product_id), 200   
 
 
 @app.route ("/registrocomprador", methods=["GET", "POST"])
@@ -268,9 +284,21 @@ def categorias():
             categorias = Seller.query.filter_by(category_id=categoria).all()
             if categorias is None:
                 return jsonify("No existen tiendas"), 200
-            for category_id in categorias:
-                arreglo.append(category_id.storename)
-            return jsonify(arreglo), 200
+            categorias = list(map(lambda cat: {"id": cat.id, "storename": cat.storename}, categorias))
+            #for category_id in categorias:
+            #arreglo.append(category_id.storename)
+            return jsonify(categorias), 200
+
+
+@app.route ("/tienda/<int:sellerID>", methods=["GET"])
+def tienda(sellerID):
+    if request.method == "GET":
+        seller = Seller.query.get(sellerID)
+        if seller is None:
+            return jsonify("No existe tienda"), 404
+        
+        return jsonify(seller.serialize()), 200
+
 
 @app.route ("/registrotienda", methods=["GET", "POST"])
 def seller():

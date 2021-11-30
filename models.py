@@ -50,6 +50,10 @@ class Seller(db.Model):
             'id': self.id,
             'storename': self.storename
         }
+    def serialize_just_storename(self):
+        return {
+            'storename': self.storename
+        }
 
 
 class Buyer(db.Model):
@@ -58,7 +62,7 @@ class Buyer(db.Model):
     firstname = db.Column(db.String(50), nullable=False)
     lastname = db.Column(db.String(50), nullable=False)
     rut = db.Column(db.String(12), nullable=False)
-    password = db.Column(db.String(20), nullable=False)
+    password = db.Column(db.String(250), nullable=False)
     email = db.Column(db.String(30), nullable=False)
     favorite = db.relationship("Favorite", backref=db.backref("buyer", lazy = True))
     payment = db.relationship("Payment", backref=db.backref("buyer", lazy = True))
@@ -156,6 +160,10 @@ class Product(db.Model):
             'id': self.id,
             'item_title': self.item_title,
             'item_price': self.item_price
+        }
+    def serialize_just_sellerID(self):
+        return {
+            'sellerID': self.sellerID
         }
 
 class Images(db.Model):
