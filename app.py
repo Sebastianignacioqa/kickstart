@@ -126,6 +126,7 @@ def product():
         product.item_price = request.json.get("item_price")
         product.category_id = request.json.get("category_id")
         product.sellerID = request.json.get("sellerID")
+        product.imageID = request.json.get("imageID")
     
         db.session.add(product)
         db.session.commit()
@@ -269,8 +270,23 @@ def upload_files():
     for uploaded_file in request.files.getlist('file'):
         if uploaded_file.filename != '':
             uploaded_file.save(os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename))
+            imagen = request.files['file']
+            mimetype = imagen.mimetype
+            newimg = Images(name= imagen.filename, img= imagen.read(), mimetype=mimetype)
+
+            db.session.add(newimg)
+            db.session.commit()      
+            return "El documento fue adjunto satisfactoriamente"
             
-    return "El documento fue adjunto satisfactoriamente"
+    images = Images.query.get(9)
+    return jsonify({
+                "images": images.serialize()
+            }), 200
+
+@app.route('/img', methods=['GET'])
+def img():
+    images = Images.query.get(17)
+    return jsonify({"images": images.serialize()}), 200
 
 @app.route('/documents/<filename>')
 def upload(filename):

@@ -120,7 +120,7 @@ class Product(db.Model):
     item_stock = db.Column(db.Integer, nullable=False)
     item_price = db.Column(db.Integer, nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey("category.id"), nullable=False)
-    images = db.relationship("Images", backref=db.backref("product", lazy = True))
+    imageID = db.Column(db.Integer, db.ForeignKey('images.id'), nullable=False)
     wishlist = db.relationship("Wishlist", backref=db.backref("product", lazy = True))
     
     
@@ -157,11 +157,18 @@ class Product(db.Model):
 class Images(db.Model):
     __tablename__= 'images'
     id= db.Column(db.Integer, primary_key=True)
-    productid = db.Column(db.Integer, db.ForeignKey('product.id'))
-    imagenes = db.Column(db.String(250))
+    img = db.Column(db.String(250))
+    name = db.Column(db.String(250))
+    mimetype = db.Column(db.String(250))
+    product = db.relationship("Product", backref=db.backref("images", lazy = True))
 
     def __repr__(self):
         return "<Images %r>" % self.id
+    
+    def serialize(self):
+        return {
+            'id': self.id,
+        }
 
 class Favorite(db.Model):
     __tablename__= 'favorite'
